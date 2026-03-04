@@ -1,14 +1,17 @@
+import java.util.Scanner;
+
+
 public class IO {
 
     // INPUT
-    public static String requestUsername() {
+    public static String requestUsername(Scanner scanner) {
         System.out.println("Твоё имя?");
-        return "Антон (Чё звал сларк)";
+        return scanner.nextLine();
     }
 
-    public static String requestIP() {
+    public static String requestIP(Scanner scanner) {
         System.out.println("Введи ip, с которым хочешь начать чат (или чёт такое)");
-        return "192.168.67.67";
+        return scanner.nextLine();
     }
 
 
@@ -19,6 +22,7 @@ public class IO {
     }
 
     public static void printMenu() {
+        System.out.println("\t\tМеню:");
         System.out.println("1. Изменить свой Username");
         System.out.println("2. Начать чат");
         System.out.println("-1. Закрыть программу");
