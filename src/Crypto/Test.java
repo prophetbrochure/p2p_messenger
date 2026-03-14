@@ -6,8 +6,14 @@ public class Test {
         for (int i = 0; i < 8; i++) {
             Key key = new Key(8);
             key.generateKey();
-            System.out.println(key.toHexString());
+            Key copy = key.getCopy();
+
             System.out.println(key.toBinString());
+            System.out.println(copy.toBinString());
+
+            System.out.println(key.toHexString());
+            System.out.println(copy.toHexString() + "\n\n");
         }
+
     }
 }

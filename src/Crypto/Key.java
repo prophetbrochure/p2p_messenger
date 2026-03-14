@@ -2,6 +2,7 @@ package Crypto;
 
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 public class Key {
@@ -16,6 +17,11 @@ public class Key {
         secureRandom.nextBytes(key);
     }
 
+    Key getCopy() {
+        Key result = new Key(this.key.length);
+        result.key = Arrays.copyOf(this.key, this.key.length);
+        return result;
+    }
 
 
 
