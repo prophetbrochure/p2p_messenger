@@ -1,6 +1,8 @@
 import java.util.Scanner;
 
-
+/**
+ * Класс для работы с вводом/выводом.
+ */
 public class IO {
 
     // INPUT

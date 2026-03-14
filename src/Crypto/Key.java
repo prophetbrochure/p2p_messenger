@@ -1,10 +1,11 @@
 package Crypto;
 
-
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-
+/**
+ * <p>Криптографический ключ. Содержит массив байтов произвольной длины.</p>
+ */
 public class Key {
     byte[] key;
 
@@ -12,6 +13,9 @@ public class Key {
         key = new byte[keyLength];
     }
 
+    /**
+     * <p>Заполняет массив байтов key внутри класса Key случайными значениями.</p>
+     */
     void generateKey() {
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(key);
@@ -23,29 +27,4 @@ public class Key {
         return result;
     }
 
-
-
-
-
-    String toHexString() {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : key) {
-            sb.append(String.format("%02X", b));
-            sb.append(' ');
-        }
-        return sb.toString();
-    }
-
-    String toBinString() {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : key) {
-            sb.append(
-                    String.format("%8s",
-                            Integer.toBinaryString(b & 0xFF)
-                    ).replace(' ', '0')
-            );
-            sb.append(' ');
-        }
-        return sb.toString();
-    }
 }
