@@ -19,7 +19,8 @@ public class State {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < 8; i++){
-            char c = (char) ((matrix[2 * i] << 8) | (matrix[2 * i + 1] & 0xFF));
+            char c = (char) ((matrix[8 * (i % 2) + (i / 2)] << 8) | (matrix[8 * (i % 2) + 4 + (i / 2)] & 0xFF));
+
             if(c != 0){
                 sb.append(c);
             }

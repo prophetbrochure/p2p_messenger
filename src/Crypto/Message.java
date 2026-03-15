@@ -1,34 +1,38 @@
 package Crypto;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Message {
     public char[] value;
-    private int pointer;
 
     Message(String value) {
         this.value = value.toCharArray();
-
-        this.pointer = 0;
     }
 
     /**
-     * <p>Используется для преобразования сообщения в набор объектов класса State,
-     * чтобы работать со строкой как с массивом байтов для шифрования.</p>
-     * <p>Повторное использование функции представляет следующие 8 символов в виде State.</p>
-     *
-     * <p>Если строка закончилась, возвращает null.</p>
+     * <p>Разбивает сообщение на список объектов класса State,
+     * чтобы работать с набором матриц 4x4</p>
      *
      * @see State
      */
-    State getNextState() {
-        if (pointer >= value.length) {
-            return null;
+    List<State> getStatesList() {
+        List<State> result = new LinkedList<>();
+        int pointer = 0;
+
+        while (pointer < value.length) {
+            State currentState = new State();
+
+            for (int i = 0; i < 8 && pointer < value.length; i++, pointer++) {
+                char c = value[pointer];
+
+                currentState.matrix[8 * (i % 2) + (i / 2)] = (byte) (c >> 8);
+                currentState.matrix[8 * (i % 2) + 4 + (i / 2)] = (byte) c;
+            }
+            result.add(currentState);
         }
-        State result = new State();
-        for (int i = 0; pointer < value.length && i < 8; i++, pointer++) {  // 1 char = 2 байта
-            char c = value[pointer];
-            result.matrix[2 * i] = (byte) (c >> 8);
-            result.matrix[2 * i + 1] = (byte) c;
-        }
+
         return result;
     }
+
 }
