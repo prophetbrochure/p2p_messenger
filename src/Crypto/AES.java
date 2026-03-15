@@ -16,14 +16,18 @@ public class AES {
      * <p>Замена байтов на другие согласно таблице коммутации.</p>
      */
     private static void subBytes(State block) {
-
+        for (int i = 0; i < 16; i++) {
+            block.matrix[i] = Constants.SBOX[block.matrix[i] & 0xFF];
+        }
     }
 
     /**
      * <p><h2><strong>Операция, обратная subBytes.</strong></h2></p>
      */
     private static void reverseSubBytes(State block) {
-
+        for (int i = 0; i < 16; i++) {
+            block.matrix[i] = Constants.reverseSBOX[block.matrix[i] & 0xFF];
+        }
     }
 
 
@@ -72,16 +76,6 @@ public class AES {
         }
     }
 
-    /**
-     * <p><h2><strong>Операция, обратная addRoundKey.</strong></h2></p>
-     * <p>Вроде бы XOR обратен сам себе, так что этот метод, возможно, не нужен.</p>
-     */
-    private static void reverseAddRoundKey(State block, Key roundKey) {
-        for (int i = 0; i < 16; i++) {
-            block.matrix[i] ^= roundKey.key[i];   // ^ - XOR
-        }
-    }
-
 
     /**
      * <p><h2><strong>Шифрование 16-байтового блока в 10 раундов с использованием 128-битного ключа</strong></h2></p>
@@ -100,6 +94,13 @@ public class AES {
     public static void encryptState(State block, Key key) {
         addRoundKey(block, key);
 
+        for(int i = 0; i < 9; i++){
+            subBytes(block);
+            addRoundKey(block, key);
+        }
+
+        subBytes(block);
+        addRoundKey(block, key);
     }
 
     /**
@@ -109,7 +110,15 @@ public class AES {
      * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
     public static void decryptState(State block, Key key) {
-        reverseAddRoundKey(block, key);
+        addRoundKey(block, key);
+        reverseSubBytes(block);
 
+        for(int i = 0; i < 9; i++){
+            addRoundKey(block, key);
+            reverseSubBytes(block);
+        }
+
+        addRoundKey(block, key);
     }
 }
+
