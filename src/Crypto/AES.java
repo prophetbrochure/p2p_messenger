@@ -67,7 +67,9 @@ public class AES {
      * <p><h2><strong>Блок XORится с раундовым ключом.</strong></h2></p>
      */
     private static void addRoundKey(State block, Key roundKey) {
-
+        for (int i = 0; i < 16; i++) {
+            block.matrix[i] ^= roundKey.key[i];   // ^ - XOR
+        }
     }
 
     /**
@@ -75,7 +77,9 @@ public class AES {
      * <p>Вроде бы XOR обратен сам себе, так что этот метод, возможно, не нужен.</p>
      */
     private static void reverseAddRoundKey(State block, Key roundKey) {
-
+        for (int i = 0; i < 16; i++) {
+            block.matrix[i] ^= roundKey.key[i];   // ^ - XOR
+        }
     }
 
 
@@ -94,6 +98,7 @@ public class AES {
      * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
     public static void encryptState(State block, Key key) {
+        addRoundKey(block, key);
 
     }
 
@@ -104,6 +109,7 @@ public class AES {
      * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
     public static void decryptState(State block, Key key) {
+        reverseAddRoundKey(block, key);
 
     }
 }

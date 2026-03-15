@@ -9,6 +9,9 @@ import java.util.Arrays;
 public class Key {
     byte[] key;
 
+    /**
+     * @param keyLength длина ключа в байтах
+     */
     Key(int keyLength) {
         key = new byte[keyLength];
     }
