@@ -8,7 +8,7 @@ package Crypto;
 public class State {
     public byte[] matrix;
 
-    State(){
+    State() {
         this.matrix = new byte[16];
     }
 
@@ -16,12 +16,12 @@ public class State {
      * <p>Преобразует 16 байтов из State в строку из 8 char'ов.</p>
      * <p>Не добавляет пустые байты 00, которые получаются при разборе последних символов строки, длина которой не кратна 0.</p>
      */
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             char c = (char) ((matrix[8 * (i % 2) + (i / 2)] << 8) | (matrix[8 * (i % 2) + 4 + (i / 2)] & 0xFF));
 
-            if(c != 0){
+            if (c != 0) {
                 sb.append(c);
             }
         }

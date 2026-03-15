@@ -89,6 +89,7 @@ public class AES {
      * <li> MixColumns (кроме последнего раунда)</li>
      * <li> AddRoundKey </li>
      * </ol></p>
+     *
      * @param block - блок, который будет зашифрован.
      * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
@@ -100,7 +101,7 @@ public class AES {
      * <p><h2><strong>Дешифрование 16-байтового блока.</strong></h2></p>
      *
      * @param block - блок, который будет дешифрован.
-     * @param key - 128-битный ключ, из которого генерируются раундовые ключи.
+     * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
     public static void decryptState(State block, Key key) {
 

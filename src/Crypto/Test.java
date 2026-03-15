@@ -8,18 +8,16 @@ import java.util.List;
 public class Test {
     public static void main(String[] args) {
 
-        Message m = new Message("абвгдежзиклмнопр");
+        Message m = new Message("abcdefghijklmnopqrstuvwxyz");
 
         List<State> spisok = m.getStatesList();
 
-        // Текст -> байты
         for (State s : spisok) {
-            System.out.println(Utils.toHexString(s.matrix));
+            System.out.println(Utils.toHexMatrix(s.matrix));
         }
 
-        // Байты -> текст
-        for(State s : spisok){
-            System.out.println(s.toString());
+        for (State s : spisok) {
+            System.out.println(Utils.toBinMatrix(s.matrix));
         }
 
 
