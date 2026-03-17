@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * <p>Криптографический ключ. Содержит массив байтов произвольной длины.</p>
+ * <h2><strong><p>Криптографический ключ. Содержит массив байтов произвольной длины.</p></strong></h2>
  */
 public class Key {
     byte[] key;
@@ -17,7 +17,7 @@ public class Key {
     }
 
     /**
-     * <p>Заполняет массив байтов key внутри класса Key случайными значениями.</p>
+     * <p>Заполняет массив байтов key случайными значениями.</p>
      */
     void generateKey() {
         SecureRandom secureRandom = new SecureRandom();

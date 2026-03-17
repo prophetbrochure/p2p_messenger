@@ -13,6 +13,7 @@ public class Test {
         Key k = new Key(16);
         k.generateKey();
 
+        System.out.println("Ключ: " + Utils.toHexString(k.key));
 
         System.out.println("Исходный текст:");
         for (State s : spisok) {
@@ -37,6 +38,18 @@ public class Test {
             System.out.printf(s.toString());
         }
 
+        AES.encryptState(spisok.get(0), k);
+
+        System.out.println("\n" + Utils.toHexMatrix(spisok.getFirst().matrix));
+
+        AES.shiftRows(spisok.getFirst());
+
+        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
+
+        AES.reverseShiftRows(spisok.getFirst());
+
+        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
+
+
     }
 }
-
