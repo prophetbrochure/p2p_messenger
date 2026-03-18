@@ -104,15 +104,17 @@ public class AES {
      * </p>
      */
     public static void mixColumns(State block) {
+        byte[] temp = new byte[16];
         for (int column = 0; column < 4; column++) {    // Для каждого столбца
             for (int row = 0; row < 4; row++) {         // Для каждой строки
-                block.matrix[row * 4 + column] = (byte) (
+                temp[row * 4 + column] = (byte) (
                     product(Constants.mixColumnsMatrix[4 * row + 0], block.matrix[ 0 + column]) ^
                     product(Constants.mixColumnsMatrix[4 * row + 1], block.matrix[ 4 + column]) ^
                     product(Constants.mixColumnsMatrix[4 * row + 2], block.matrix[ 8 + column]) ^
                     product(Constants.mixColumnsMatrix[4 * row + 3], block.matrix[12 + column]));
             }
         }
+        System.arraycopy(temp, 0, block.matrix, 0, 16);
     }
 
     /**
@@ -129,15 +131,17 @@ public class AES {
      *
      */
     public static void reverseMixColumns(State block) {
+        byte[] temp = new byte[16];
         for (int column = 0; column < 4; column++) {    // Для каждого столбца
             for (int row = 0; row < 4; row++) {         // Для каждой строки
-                block.matrix[row * 4 + column] = (byte) (
+                temp[row * 4 + column] = (byte) (
                     product(Constants.reverseMixColumnsMatrix[4 * row + 0], block.matrix[ 0 + column]) ^
                     product(Constants.reverseMixColumnsMatrix[4 * row + 1], block.matrix[ 4 + column]) ^
                     product(Constants.reverseMixColumnsMatrix[4 * row + 2], block.matrix[ 8 + column]) ^
                     product(Constants.reverseMixColumnsMatrix[4 * row + 3], block.matrix[12 + column]));
             }
         }
+        System.arraycopy(temp, 0, block.matrix, 0, 16);
     }
 
     /**
