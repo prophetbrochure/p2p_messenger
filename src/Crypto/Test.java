@@ -42,11 +42,11 @@ public class Test {
 
         System.out.println("\n" + Utils.toHexMatrix(spisok.getFirst().matrix));
 
-        AES.shiftRows(spisok.getFirst());
+        AES.mixColumns(spisok.getFirst());
 
         System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
 
-        AES.reverseShiftRows(spisok.getFirst());
+        AES.reverseMixColumns(spisok.getFirst());
 
         System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
 

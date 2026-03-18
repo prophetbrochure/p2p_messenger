@@ -46,4 +46,27 @@ class Constants {
             (byte) 0xa0, (byte) 0xe0, (byte) 0x3b, (byte) 0x4d, (byte) 0xae, (byte) 0x2a, (byte) 0xf5, (byte) 0xb0, (byte) 0xc8, (byte) 0xeb, (byte) 0xbb, (byte) 0x3c, (byte) 0x83, (byte) 0x53, (byte) 0x99, (byte) 0x61,
             (byte) 0x17, (byte) 0x2b, (byte) 0x04, (byte) 0x7e, (byte) 0xba, (byte) 0x77, (byte) 0xd6, (byte) 0x26, (byte) 0xe1, (byte) 0x69, (byte) 0x14, (byte) 0x63, (byte) 0x55, (byte) 0x21, (byte) 0x0c, (byte) 0x7d
     };
+
+
+    /**
+     * <p><h2><strong>Матрица умножения.</strong></h2></p>
+     * <p>Используется в {@link AES#mixColumns}</p>
+     */
+    static final byte[] mixColumnsMatrix = {
+            (byte) 0x02, (byte) 0x03, (byte) 0x01, (byte) 0x01,
+            (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x01,
+            (byte) 0x01, (byte) 0x01, (byte) 0x02, (byte) 0x03,
+            (byte) 0x03, (byte) 0x01, (byte) 0x01, (byte) 0x02
+    };
+
+    /**
+     * <p><h2><strong>Обратная матрица умножения.</strong></h2></p>
+     * <p>Используется в {@link AES#reverseMixColumns}</p>
+     */
+    static final byte[] reverseMixColumnsMatrix = {
+            (byte) 0x0E, (byte) 0x0B, (byte) 0x0D, (byte) 0x09,
+            (byte) 0x09, (byte) 0x0E, (byte) 0x0B, (byte) 0x0D,
+            (byte) 0x0D, (byte) 0x09, (byte) 0x0E, (byte) 0x0B,
+            (byte) 0x0B, (byte) 0x0D, (byte) 0x09, (byte) 0x0E
+    };
 }
