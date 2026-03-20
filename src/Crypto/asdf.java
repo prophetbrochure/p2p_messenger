@@ -1,6 +1,90 @@
 package Crypto;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * <p>Класс для работы с шифрованием. Содержит массив byte[16] matrix.</p>
+ * <p>
+ *     Байты записываются в следующем порядке:<br>
+ *     1A     3A    5A     7A  <br>
+ *     1B     3B    5B     7B  <br>
+ *     2A     4A    6A     8A  <br>
+ *     2B     4B    6B     8B
+ * </p>
+ *
+ * @see Key
+ */
+public class State {
+    public byte[] matrix;
+
+    State() {
+        this.matrix = new byte[16];
+    }
+
+    /**
+     * <p>Преобразует 16 байтов из State в строку из 8 char'ов.</p>
+     * <p>Не добавляет пустые байты 00, которые получаются при разборе последних символов строки, длина которой не кратна 0.</p>
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            char c = (char) ((matrix[8 * (i % 2) + (i / 2)] << 8) | (matrix[8 * (i % 2) + 4 + (i / 2)] & 0xFF));
+
+            if (c != 0) {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
+    }
+}
+
+
+package Crypto;
+
+import java.util.LinkedList;
+import java.util.List;
+
+public class Message {
+    public char[] value;
+
+    Message(String value) {
+        this.value = value.toCharArray();
+    }
+
+    /**
+     * <p>Разбивает сообщение на список объектов класса State,
+     * чтобы работать с набором матриц 4x4</p>
+     *
+     * @see State
+     */
+    List<State> getStatesList() {
+        List<State> result = new LinkedList<>();
+        int pointer = 0;
+
+        while (pointer < value.length) {
+            State currentState = new State();
+
+            for (int i = 0; i < 8 && pointer < value.length; i++, pointer++) {
+                char c = value[pointer];
+
+                currentState.matrix[8 * (i % 2) + (i / 2)] = (byte) (c >> 8);
+                currentState.matrix[8 * (i % 2) + 4 + (i / 2)] = (byte) c;
+            }
+            result.add(currentState);
+        }
+
+        return result;
+    }
+
+}
+
+
+package Crypto;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
