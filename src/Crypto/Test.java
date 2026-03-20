@@ -12,6 +12,7 @@ public class Test {
         List<State> spisok = m.getStatesList();
         Key k = new Key(16);
         k.generateKey();
+        AES128 cipher = new AES128(k);
 
         System.out.println("Ключ: " + Utils.toHexString(k.key));
 
@@ -21,7 +22,7 @@ public class Test {
         }
 
         for (State s : spisok) {
-            AES.encryptState(s, k);
+            cipher.encryptState(s);
         }
 
         System.out.println("\nШифротекст:");
@@ -30,7 +31,7 @@ public class Test {
         }
 
         for (State s : spisok) {
-            AES.decryptState(s, k);
+            cipher.decryptState(s);
         }
 
         System.out.println("\nРасшифрованный текст:");
@@ -38,9 +39,9 @@ public class Test {
             System.out.printf(s.toString());
         }
 
-        AES.encryptState(spisok.get(0), k);
+        cipher.encryptState(spisok.get(0));
 
-        System.out.println("\n" + Utils.toHexMatrix(spisok.getFirst().matrix));
+//        System.out.println("\n" + Utils.toHexMatrix(spisok.getFirst().matrix));
 
 //        AES.mixColumns(spisok.getFirst());
 //

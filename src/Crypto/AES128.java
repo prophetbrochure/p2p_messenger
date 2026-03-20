@@ -13,8 +13,26 @@ import java.util.List;
  *     <li>{@link #addRoundKey} - XOR с раундовым ключом</li>
  * </ol>
  * </p>
+ * <p>
+ *     Генерирует набор из 11 раундовых ключей при создании экземпляра.
+ * </p>
  */
-public class AES {
+public class AES128 {
+    /**
+     * <p><h2><strong>Список из 11 раундовых {@link Key ключей}.</strong></h2></p>
+     * <p>Генерируется из начального ключа с помощью {@link AES128#keyExpansion}</p>
+     */
+    List<Key> keys;
+
+    /**
+     *
+     * @param initialKey - ключ, на основе которого {@link AES128#keyExpansion генерируется} список из 11 раундовых {@link Key ключей}
+     */
+    AES128(Key initialKey) {
+        this.keys = keyExpansion(initialKey);
+    }
+
+
     /**
      * <p>Замена байтов на другие согласно {@link Constants#SBOX таблице коммутации}</p>
      */
@@ -103,7 +121,7 @@ public class AES {
      * U - незашифрованный столбец.
      * </p>
      * <p>Вместо сложения используется XOR<br>
-     * Вместо умножения - {@link AES#product умножение в поле Галуа GF(2⁸)} (Что бы это ни значило)
+     * Вместо умножения - {@link AES128#product умножение в поле Галуа GF(2⁸)} (Что бы это ни значило)
      * </p>
      */
     @SuppressWarnings("PointlessArithmeticExpression")
@@ -151,7 +169,7 @@ public class AES {
 
     /**
      * <h2><strong>Умножение в поле Галуа GF(2⁸)</strong></h2>
-     * <p>Используется в {@link AES#mixColumns} и в {@link AES#reverseMixColumns}</p>
+     * <p>Используется в {@link AES128#mixColumns} и в {@link AES128#reverseMixColumns}</p>
      * <p>Использует алгоритм "Русского крестьянина" (Буквально, это не рофл.)</p>
      */
     private static byte product(byte a, byte b) {
@@ -185,7 +203,8 @@ public class AES {
 
 
     /**
-     * <p><h2><strong>Шифрование {@link State 16-байтового блока} в 10 раундов с использованием 128-битного {@link Key ключа}</strong></h2></p>
+     * <p><h2><strong>Шифрование {@link State 16-байтового блока} в 10 раундов
+     * с использованием набора из 11 128-битных раундовых {@link Key ключей}</strong></h2></p>
      *
      * <p>
      * Шаги шифрования на каждом раунде: <ol>
@@ -196,10 +215,8 @@ public class AES {
      * </ol></p>
      *
      * @param block - блок, который будет зашифрован.
-     * @param initialKey   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
-    public static void encryptState(State block, Key initialKey) {
-        List<Key> keys = keyExpansion(initialKey);
+    public void encryptState(State block) {
         addRoundKey(block, keys.get(0));
 
         for (int roundNumber = 1; roundNumber <= 9; roundNumber++) {
@@ -219,11 +236,8 @@ public class AES {
      * <p>Обратна к {@link #encryptState}</p>
      *
      * @param block - блок, который будет дешифрован.
-     * @param initialKey   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
-    public static void decryptState(State block, Key initialKey) {
-        List<Key> keys = keyExpansion(initialKey);
-
+    public void decryptState(State block) {
         addRoundKey(block, keys.get(10));
         reverseShiftRows(block);
         reverseSubBytes(block);
@@ -239,9 +253,20 @@ public class AES {
     }
 
     /**
-     * <p><h2><strong>Генерирует список из 11 ключей для каждого из раундов шифрования</strong></h2></p>
+     * <p><h2><strong>Генерирует список из 11 {@link Key ключей} для каждого из раундов шифрования</strong></h2></p>
+     */
+    /* Тут костыль на костыле. Я сначала реализовал keyExpansion, но он работал по строкам, а не по столбцам, как должен был.
+     * Прикрутил в начало транспонирование ключа, таким образом строки стали столбцами и наоборот.
      */
     private static List<Key> keyExpansion(Key initialKey) {
+        for (int row = 0; row < 4; row++) {     // Транспонирование.
+            for (int column = row; column < 4; column++) {
+                byte b = initialKey.key[4 * row + column];
+                initialKey.key[4 * row + column] = initialKey.key[4 * column + row];
+                initialKey.key[4 * column + row] = b;
+            }
+        }
+
         List<Key> keys = new ArrayList<>(11);
 
         keys.add(0, new Key(16));
@@ -263,14 +288,15 @@ public class AES {
                     for (int i = 0; i < 4; i++) {   // SubBytes + XOR с константой раунда
                         temp[i] = Constants.SBOX[temp[i] & 0xFF];
                     }
-                    temp[0] ^=  Constants.RCON[keyNumber - 1];
+                    temp[0] ^= Constants.RCON[keyNumber - 1];
 
                 } else {
                     System.arraycopy(keys.get(keyNumber).key, 4 * (wordNumber - 1), temp, 0, 4);
                 }
 
                 for (int byteNumber = 0; byteNumber < 4; byteNumber++) {
-                    keys.get(keyNumber).key[4 * wordNumber + byteNumber] = (byte) (keys.get(keyNumber - 1).key[4 * wordNumber + byteNumber] ^ temp[byteNumber]);
+                    keys.get(keyNumber).key[4 * wordNumber + byteNumber] =
+                            (byte) (keys.get(keyNumber - 1).key[4 * wordNumber + byteNumber] ^ temp[byteNumber]);
                 }
             }
 
@@ -278,4 +304,3 @@ public class AES {
         return keys;
     }
 }
-

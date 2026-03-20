@@ -3,7 +3,7 @@ package Crypto;
 class Constants {
     /**
      * <p><h2><strong>Таблица замены. Содержит 256 значений для каждого байта.</strong></h2></p>
-     * <p>Используется в {@link AES#subBytes}</p>
+     * <p>Используется в {@link AES128#subBytes}</p>
      */
     static final byte[] SBOX = {
             (byte) 0x63, (byte) 0x7c, (byte) 0x77, (byte) 0x7b, (byte) 0xf2, (byte) 0x6b, (byte) 0x6f, (byte) 0xc5, (byte) 0x30, (byte) 0x01, (byte) 0x67, (byte) 0x2b, (byte) 0xfe, (byte) 0xd7, (byte) 0xab, (byte) 0x76,
@@ -26,7 +26,7 @@ class Constants {
 
     /**
      * <p><h2><strong>Таблица обратной замены. Обратна S-BOX. Содержит 256 значений для каждого байта.</strong></h2></p>
-     * <p>Используется в {@link AES#reverseSubBytes}</p>
+     * <p>Используется в {@link AES128#reverseSubBytes}</p>
      */
     static final byte[] reverseSBOX = {
             (byte) 0x52, (byte) 0x09, (byte) 0x6a, (byte) 0xd5, (byte) 0x30, (byte) 0x36, (byte) 0xa5, (byte) 0x38, (byte) 0xbf, (byte) 0x40, (byte) 0xa3, (byte) 0x9e, (byte) 0x81, (byte) 0xf3, (byte) 0xd7, (byte) 0xfb,
@@ -50,7 +50,7 @@ class Constants {
 
     /**
      * <p><h2><strong>Матрица умножения.</strong></h2></p>
-     * <p>Используется в {@link AES#mixColumns}</p>
+     * <p>Используется в {@link AES128#mixColumns}</p>
      */
     static final byte[] mixColumnsMatrix = {
             (byte) 0x02, (byte) 0x03, (byte) 0x01, (byte) 0x01,
@@ -61,7 +61,7 @@ class Constants {
 
     /**
      * <p><h2><strong>Обратная матрица умножения.</strong></h2></p>
-     * <p>Используется в {@link AES#reverseMixColumns}</p>
+     * <p>Используется в {@link AES128#reverseMixColumns}</p>
      */
     static final byte[] reverseMixColumnsMatrix = {
             (byte) 0x0E, (byte) 0x0B, (byte) 0x0D, (byte) 0x09,
@@ -72,7 +72,7 @@ class Constants {
 
     /**
      * <p><h2><strong>Константы раунда.</strong></h2></p>
-     * <p>Используются в {@link AES#keyExpansion}</p>
+     * <p>Используются в {@link AES128#keyExpansion}</p>
      */
     static final byte[] RCON = {
             (byte) 0x01,
