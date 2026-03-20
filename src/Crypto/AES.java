@@ -1,5 +1,8 @@
 package Crypto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <p>Класс для шифрования {@link State блока из 16 байт}.</p>
  * <p>Реализованы методы:
@@ -7,7 +10,7 @@ package Crypto;
  *     <li>{@link #subBytes} - подстановка </li>
  *     <li>{@link #shiftRows} - сдвиг</li>
  *     <li>{@link #mixColumns} - умножение матриц</li>
- *     <li>{@link #addRoundKey} - XOR с ключом</li>
+ *     <li>{@link #addRoundKey} - XOR с раундовым ключом</li>
  * </ol>
  * </p>
  */
@@ -48,7 +51,7 @@ public class AES {
      */
     private static void shiftRows(State block) {
         byte x = block.matrix[4], y = block.matrix[15];
-        block.matrix[4] = block.matrix[5];      // 1 строка
+        block.matrix[4] = block.matrix[5];      // 2 строка
         block.matrix[5] = block.matrix[6];
         block.matrix[6] = block.matrix[7];
         block.matrix[7] = x;
@@ -58,7 +61,7 @@ public class AES {
         block.matrix[13] = block.matrix[12];
         block.matrix[12] = y;
 
-        x = block.matrix[8];                    // 2 строка
+        x = block.matrix[8];                    // 4 строка
         y = block.matrix[9];
         block.matrix[8] = block.matrix[10];
         block.matrix[9] = block.matrix[11];
@@ -72,7 +75,7 @@ public class AES {
     private static void reverseShiftRows(State block) {
         byte x = block.matrix[7], y = block.matrix[12];
 
-        block.matrix[7] = block.matrix[6];      // 1 строка
+        block.matrix[7] = block.matrix[6];      // 2 строка
         block.matrix[6] = block.matrix[5];
         block.matrix[5] = block.matrix[4];
         block.matrix[4] = x;
@@ -82,7 +85,7 @@ public class AES {
         block.matrix[14] = block.matrix[15];
         block.matrix[15] = y;
 
-        x = block.matrix[8];                    // 2 строка
+        x = block.matrix[8];                    // 4 строка
         y = block.matrix[9];
         block.matrix[8] = block.matrix[10];
         block.matrix[9] = block.matrix[11];
@@ -103,15 +106,16 @@ public class AES {
      * Вместо умножения - {@link AES#product умножение в поле Галуа GF(2⁸)} (Что бы это ни значило)
      * </p>
      */
-    public static void mixColumns(State block) {
+    @SuppressWarnings("PointlessArithmeticExpression")
+    private static void mixColumns(State block) {
         byte[] temp = new byte[16];
         for (int column = 0; column < 4; column++) {    // Для каждого столбца
             for (int row = 0; row < 4; row++) {         // Для каждой строки
                 temp[row * 4 + column] = (byte) (
-                    product(Constants.mixColumnsMatrix[4 * row + 0], block.matrix[ 0 + column]) ^
-                    product(Constants.mixColumnsMatrix[4 * row + 1], block.matrix[ 4 + column]) ^
-                    product(Constants.mixColumnsMatrix[4 * row + 2], block.matrix[ 8 + column]) ^
-                    product(Constants.mixColumnsMatrix[4 * row + 3], block.matrix[12 + column]));
+                        product(Constants.mixColumnsMatrix[4 * row + 0], block.matrix[0 + column]) ^
+                                product(Constants.mixColumnsMatrix[4 * row + 1], block.matrix[4 + column]) ^
+                                product(Constants.mixColumnsMatrix[4 * row + 2], block.matrix[8 + column]) ^
+                                product(Constants.mixColumnsMatrix[4 * row + 3], block.matrix[12 + column]));
             }
         }
         System.arraycopy(temp, 0, block.matrix, 0, 16);
@@ -130,15 +134,16 @@ public class AES {
      * </p>
      *
      */
-    public static void reverseMixColumns(State block) {
+    @SuppressWarnings("PointlessArithmeticExpression")
+    private static void reverseMixColumns(State block) {
         byte[] temp = new byte[16];
         for (int column = 0; column < 4; column++) {    // Для каждого столбца
             for (int row = 0; row < 4; row++) {         // Для каждой строки
                 temp[row * 4 + column] = (byte) (
-                    product(Constants.reverseMixColumnsMatrix[4 * row + 0], block.matrix[ 0 + column]) ^
-                    product(Constants.reverseMixColumnsMatrix[4 * row + 1], block.matrix[ 4 + column]) ^
-                    product(Constants.reverseMixColumnsMatrix[4 * row + 2], block.matrix[ 8 + column]) ^
-                    product(Constants.reverseMixColumnsMatrix[4 * row + 3], block.matrix[12 + column]));
+                        product(Constants.reverseMixColumnsMatrix[4 * row + 0], block.matrix[0 + column]) ^
+                                product(Constants.reverseMixColumnsMatrix[4 * row + 1], block.matrix[4 + column]) ^
+                                product(Constants.reverseMixColumnsMatrix[4 * row + 2], block.matrix[8 + column]) ^
+                                product(Constants.reverseMixColumnsMatrix[4 * row + 3], block.matrix[12 + column]));
             }
         }
         System.arraycopy(temp, 0, block.matrix, 0, 16);
@@ -146,6 +151,7 @@ public class AES {
 
     /**
      * <h2><strong>Умножение в поле Галуа GF(2⁸)</strong></h2>
+     * <p>Используется в {@link AES#mixColumns} и в {@link AES#reverseMixColumns}</p>
      * <p>Использует алгоритм "Русского крестьянина" (Буквально, это не рофл.)</p>
      */
     private static byte product(byte a, byte b) {
@@ -161,7 +167,7 @@ public class AES {
                 a = (byte) (a ^ 0x1b);
             }
             b = (byte) ((b & 0xFF) >> 1);   //  (b & 0xFF) из-за того, что при логических операциях byte автоматически кастуется в int,
-                                            //  при этом сохраняя знак -.
+            //  при этом сохраняя знак -.
         }
         return res;
     }
@@ -190,21 +196,22 @@ public class AES {
      * </ol></p>
      *
      * @param block - блок, который будет зашифрован.
-     * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
+     * @param initialKey   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
-    public static void encryptState(State block, Key key) {
-        addRoundKey(block, key);
+    public static void encryptState(State block, Key initialKey) {
+        List<Key> keys = keyExpansion(initialKey);
+        addRoundKey(block, keys.get(0));
 
-        for (int i = 0; i < 9; i++) {
+        for (int roundNumber = 1; roundNumber <= 9; roundNumber++) {
             subBytes(block);
             shiftRows(block);
             mixColumns(block);
-            addRoundKey(block, key);
+            addRoundKey(block, keys.get(roundNumber));
         }
 
         subBytes(block);
         shiftRows(block);
-        addRoundKey(block, key);
+        addRoundKey(block, keys.get(10));
     }
 
     /**
@@ -212,21 +219,63 @@ public class AES {
      * <p>Обратна к {@link #encryptState}</p>
      *
      * @param block - блок, который будет дешифрован.
-     * @param key   - 128-битный ключ, из которого генерируются раундовые ключи.
+     * @param initialKey   - 128-битный ключ, из которого генерируются раундовые ключи.
      */
-    public static void decryptState(State block, Key key) {
-        addRoundKey(block, key);
+    public static void decryptState(State block, Key initialKey) {
+        List<Key> keys = keyExpansion(initialKey);
+
+        addRoundKey(block, keys.get(10));
         reverseShiftRows(block);
         reverseSubBytes(block);
 
-        for (int i = 0; i < 9; i++) {
-            addRoundKey(block, key);
+        for (int i = 9; i >= 1; i--) {
+            addRoundKey(block, keys.get(i));
             reverseMixColumns(block);
             reverseShiftRows(block);
             reverseSubBytes(block);
         }
 
-        addRoundKey(block, key);
+        addRoundKey(block, keys.get(0));
+    }
+
+    /**
+     * <p><h2><strong>Генерирует список из 11 ключей для каждого из раундов шифрования</strong></h2></p>
+     */
+    private static List<Key> keyExpansion(Key initialKey) {
+        List<Key> keys = new ArrayList<>(11);
+
+        keys.add(0, new Key(16));
+        System.arraycopy(initialKey.key, 0, keys.getFirst().key, 0, 16);
+
+        for (int keyNumber = 1; keyNumber < 11; keyNumber++) {
+            keys.add(keyNumber, new Key(16));
+            for (int wordNumber = 0; wordNumber < 4; wordNumber++) {
+                byte[] temp = new byte[4];
+                if (wordNumber == 0) {
+                    System.arraycopy(keys.get(keyNumber - 1).key, 12, temp, 0, 4);  // Последнее слово предыдущего раунда.
+
+                    byte left = temp[0];    // Сдвиг на 1 влево (RotWord)
+                    temp[0] = temp[1];
+                    temp[1] = temp[2];
+                    temp[2] = temp[3];
+                    temp[3] = left;
+
+                    for (int i = 0; i < 4; i++) {   // SubBytes + XOR с константой раунда
+                        temp[i] = Constants.SBOX[temp[i] & 0xFF];
+                    }
+                    temp[0] ^=  Constants.RCON[keyNumber - 1];
+
+                } else {
+                    System.arraycopy(keys.get(keyNumber).key, 4 * (wordNumber - 1), temp, 0, 4);
+                }
+
+                for (int byteNumber = 0; byteNumber < 4; byteNumber++) {
+                    keys.get(keyNumber).key[4 * wordNumber + byteNumber] = (byte) (keys.get(keyNumber - 1).key[4 * wordNumber + byteNumber] ^ temp[byteNumber]);
+                }
+            }
+
+        }
+        return keys;
     }
 }
 

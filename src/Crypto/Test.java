@@ -42,13 +42,13 @@ public class Test {
 
         System.out.println("\n" + Utils.toHexMatrix(spisok.getFirst().matrix));
 
-        AES.mixColumns(spisok.getFirst());
-
-        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
-
-        AES.reverseMixColumns(spisok.getFirst());
-
-        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
+//        AES.mixColumns(spisok.getFirst());
+//
+//        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
+//
+//        AES.reverseMixColumns(spisok.getFirst());
+//
+//        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
 
 
     }

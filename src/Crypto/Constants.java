@@ -69,4 +69,21 @@ class Constants {
             (byte) 0x0D, (byte) 0x09, (byte) 0x0E, (byte) 0x0B,
             (byte) 0x0B, (byte) 0x0D, (byte) 0x09, (byte) 0x0E
     };
+
+    /**
+     * <p><h2><strong>Константы раунда.</strong></h2></p>
+     * <p>Используются в {@link AES#keyExpansion}</p>
+     */
+    static final byte[] RCON = {
+            (byte) 0x01,
+            (byte) 0x02,
+            (byte) 0x04,
+            (byte) 0x08,
+            (byte) 0x10,
+            (byte) 0x20,
+            (byte) 0x40,
+            (byte) 0x80,
+            (byte) 0x1B,
+            (byte) 0x36
+    };
 }
