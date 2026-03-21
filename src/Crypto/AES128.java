@@ -22,14 +22,14 @@ public class AES128 {
      * <p><h2><strong>Список из 11 раундовых {@link Key ключей}.</strong></h2></p>
      * <p>Генерируется из начального ключа с помощью {@link AES128#keyExpansion}</p>
      */
-    List<Key> keys;
+    List<Key> keysList;
 
     /**
      *
      * @param initialKey - ключ, на основе которого {@link AES128#keyExpansion генерируется} список из 11 раундовых {@link Key ключей}
      */
-    AES128(Key initialKey) {
-        this.keys = keyExpansion(initialKey);
+    public AES128(Key initialKey) {
+        this.keysList = keyExpansion(initialKey);
     }
 
 
@@ -217,18 +217,18 @@ public class AES128 {
      * @param block - блок, который будет зашифрован.
      */
     public void encryptState(State block) {
-        addRoundKey(block, keys.get(0));
+        addRoundKey(block, keysList.get(0));
 
         for (int roundNumber = 1; roundNumber <= 9; roundNumber++) {
             subBytes(block);
             shiftRows(block);
             mixColumns(block);
-            addRoundKey(block, keys.get(roundNumber));
+            addRoundKey(block, keysList.get(roundNumber));
         }
 
         subBytes(block);
         shiftRows(block);
-        addRoundKey(block, keys.get(10));
+        addRoundKey(block, keysList.get(10));
     }
 
     /**
@@ -238,18 +238,18 @@ public class AES128 {
      * @param block - блок, который будет дешифрован.
      */
     public void decryptState(State block) {
-        addRoundKey(block, keys.get(10));
+        addRoundKey(block, keysList.get(10));
         reverseShiftRows(block);
         reverseSubBytes(block);
 
         for (int i = 9; i >= 1; i--) {
-            addRoundKey(block, keys.get(i));
+            addRoundKey(block, keysList.get(i));
             reverseMixColumns(block);
             reverseShiftRows(block);
             reverseSubBytes(block);
         }
 
-        addRoundKey(block, keys.get(0));
+        addRoundKey(block, keysList.get(0));
     }
 
     /**

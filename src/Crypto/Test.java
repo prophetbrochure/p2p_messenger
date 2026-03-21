@@ -51,6 +51,15 @@ public class Test {
 //
 //        System.out.println(Utils.toHexMatrix(spisok.getFirst().matrix));
 
+        DH keyA = new DH(Constants.generator, Constants.module);
+        DH keyB = new DH(Constants.generator, Constants.module);
+
+        keyA.generateKey(keyB.getPublicKey());
+        keyB.generateKey(keyA.getPublicKey());
+
+        System.out.println("\nКлючи (Длина - " + keyA.getSharedSecret().toString(16).length() / 2 + " байт):");
+        System.out.println(keyA.getSharedSecret().toString(16));
+        System.out.println(keyB.getSharedSecret().toString(16));
 
     }
 }
