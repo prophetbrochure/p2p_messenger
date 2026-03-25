@@ -17,7 +17,7 @@ public class Test5001 {
             // server.connect(ip, port);
         } catch (IOException e) {
             // e.printStackTrace();
-            System.err.println("ошибка");
+            System.err.println("ошибка порт занят");
         }
     }
 }

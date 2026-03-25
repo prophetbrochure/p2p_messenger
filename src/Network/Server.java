@@ -1,16 +1,12 @@
-// ТЕСТОВАЯ ВЕРСИЯ
 package Network;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.net.ServerSocket;
+
 import java.util.List;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Server {
     private ServerSocket serverSocket;
@@ -31,10 +27,12 @@ public class Server {
                     try {
                         Socket socket = serverSocket.accept();
                         System.out.println("Входящее подключение: " + socket.getLocalAddress());
-                        peersList.add(new Peer(socket.getLocalAddress(), socket.getLocalPort()));
-                        new Thread(new PeerHandler(socket)).start();
+
+                        Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
+                        peersList.add(peer);
+                        new Thread(new PeerHandler(socket, peer)).start();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.out.println("\n\nEROR\n\nНеразу не ловил эту ошибку ещё");
                     }
                 }
             }
@@ -42,42 +40,16 @@ public class Server {
     }
 
     public void connect(String ip, int port) {
+        System.out.println("Попытка подключиться к: " + ip);
         try {
-            System.out.println("Попытка подключиться к: " + ip);
+
             Socket socket = new Socket(ip, port);
+            Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
+            peersList.add(peer);
+            new Thread(new PeerHandler(socket, peer)).start();
 
-            OutputStream output = socket.getOutputStream();
-            OutputStreamWriter oSWriter = new OutputStreamWriter(output);
-            BufferedWriter writer = new BufferedWriter(oSWriter);
-
-            System.out.println("Введите /exit чтобы отключиться");
-            Scanner scanner = new Scanner(System.in);
-
-            String message = "";
-            try {
-                while (!message.equals("/exit")) {
-                    message = scanner.nextLine();
-                    writer.write(message);
-                    writer.newLine();
-                    writer.flush();
-                }
-                System.out.println("Чат закрывается.");
-
-                scanner.close();
-                writer.close();
-                oSWriter.close();
-                output.close();
-                socket.close();
-
-            } catch (IOException e1) {
-                scanner.close();
-                writer.close();
-                oSWriter.close();
-                output.close();
-                socket.close();
-                System.out.println("Собеседник покинул чат.");
-            }
         } catch (IOException e) {
+            // Попытка переподключения
             try {
                 if (reConnectionAttempts-- > 0) {
                     System.out.println("Неудалось.\n");
