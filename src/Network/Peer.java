@@ -1,7 +1,6 @@
 package Network;
 
-// ТЕСТОВАЯ ВЕРСИЯ, СО СВОИМИ импровизированными
-// ВХОДНЫМИ ДАННЫМИ
+// ТЕСТОВАЯ ВЕРСИЯ,
 
 import java.net.InetAddress;
 import java.util.List;
