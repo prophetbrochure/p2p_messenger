@@ -3,9 +3,6 @@ package Crypto;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-/**
- * <h2><strong><p>Криптографический ключ. Содержит массив байтов произвольной длины.</p></strong></h2>
- */
 public class Key {
     byte[] key;
 
@@ -14,6 +11,16 @@ public class Key {
      */
     Key(int keyLength) {
         key = new byte[keyLength];
+    }
+
+    /**
+     * Конструктор из готового массива байт
+     */
+    Key(byte[] data) {
+        if (data.length != 16) {
+            throw new IllegalArgumentException("Key must be 16 bytes");
+        }
+        this.key = data.clone();
     }
 
     /**
@@ -29,5 +36,4 @@ public class Key {
         result.key = Arrays.copyOf(this.key, this.key.length);
         return result;
     }
-
 }

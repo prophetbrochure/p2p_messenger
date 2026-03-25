@@ -19,8 +19,14 @@ public class State {
         this.matrix = new byte[16];
     }
 
+    public State(byte[] data) {
+        if (data.length != 16) {
+            throw new IllegalArgumentException("State must be 16 bytes");
+        }
+        this.matrix = data.clone();
+    }
     /**
-     * <p>Преобразует 16 байтов из State в строку из 8 char'ов.</p>
+     * <p>Преобразует 16 байтов из State в строку из 8 char'ов</p>
      * <p>Не добавляет пустые байты 00, которые получаются при разборе последних символов строки, длина которой не кратна 0.</p>
      */
     public String toString() {
