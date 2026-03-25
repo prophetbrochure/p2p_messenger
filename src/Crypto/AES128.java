@@ -262,11 +262,10 @@ public class AES128 {
         List<Key> keys = new ArrayList<>(11);
         keys.add(0, new Key(16));
 
-        for (int row = 0; row < 4; row++) {     // Транспонирование.
-            for (int column = 0; column < 4; column++) {
-                keys.get(0).key[row * 4 + column] = initialKey.key[column * 4 + row];
-            }
-        }
+        transpondMatrix(initialKey.key);
+
+        System.arraycopy(initialKey.key, 0, keys.get(0).key, 0, 16);
+
 
         for (int keyNumber = 1; keyNumber < 11; keyNumber++) {
             keys.add(keyNumber, new Key(16));
@@ -295,8 +294,23 @@ public class AES128 {
                             (byte) (keys.get(keyNumber - 1).key[4 * wordNumber + byteNumber] ^ temp[byteNumber]);
                 }
             }
+            transpondMatrix(keys.get(keyNumber).key);
 
         }
         return keys;
+    }
+
+    /**
+     * <p><h2><strong>Транспонирование матрицы</strong></h2></p>
+     * @param matrix
+     */
+    private static void transpondMatrix(byte[] matrix){
+        for (int row = 0; row < 4; row++) {     // Транспонирование.
+            for (int column = 0; column < 4; column++) {
+                byte temp =  matrix[row * 4 + column];
+                matrix[row * 4 + column] = matrix[column * 4 + row];
+                matrix[column * 4 + row] = temp;
+            }
+        }
     }
 }
