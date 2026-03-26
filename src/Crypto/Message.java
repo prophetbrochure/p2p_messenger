@@ -1,38 +1,59 @@
 package Crypto;
 
-import java.util.LinkedList;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Message {
-    public char[] value;
+    String string;
+    byte[] paddedBytes;
 
-    Message(String value) {
-        this.value = value.toCharArray();
+    Message(String string) {
+        this.string = string;
+        byte[] unpaddedBytes = string.getBytes(StandardCharsets.UTF_8);
+
+        int paddingSize = 16 - unpaddedBytes.length % 16;
+        this.paddedBytes = new byte[unpaddedBytes.length + paddingSize];
+        System.arraycopy(unpaddedBytes, 0, this.paddedBytes, 0, unpaddedBytes.length);
+        for (int i = unpaddedBytes.length; i < paddedBytes.length; i++) {   // Используется padding PKCS#7
+            this.paddedBytes[i] = (byte) paddingSize;
+        }
     }
 
     /**
-     * <p>Разбивает сообщение на список объектов класса State,
-     * чтобы работать с набором матриц 4x4</p>
+     * <p><h2><strong>Разбивает сообщение на список объектов класса State, чтобы работать с набором матриц 4x4</strong></h2></p>
+     * <p>Используется padding PKCS#7</p>
      *
      * @see State
      */
     List<State> getStatesList() {
-        List<State> result = new LinkedList<>();
+        List<State> result = new ArrayList<>();
         int pointer = 0;
 
-        while (pointer < value.length) {
+
+        while (pointer < paddedBytes.length) {
             State currentState = new State();
-
-            for (int i = 0; i < 8 && pointer < value.length; i++, pointer++) {
-                char c = value[pointer];
-
-                currentState.matrix[8 * (i % 2) + (i / 2)] = (byte) (c >> 8);
-                currentState.matrix[8 * (i % 2) + 4 + (i / 2)] = (byte) c;
-            }
             result.add(currentState);
-        }
 
+            for (int i = 0; i < 16 && pointer < paddedBytes.length; i++, pointer++) {
+                currentState.matrix[(i % 4) * 4 + (i / 4)] = paddedBytes[pointer];
+            }
+        }
         return result;
     }
 
+    /**
+     * <p><h2><strong>Преобразует List<State> в String, с учётом padding'а</strong></h2></p>
+     */
+    static String getMessage(List<State> statesList) {
+        byte[] bytes = new byte[16 * statesList.size() - statesList.getLast().matrix[15]];
+
+        for (int stateNumber = 0; stateNumber < statesList.size(); stateNumber++) {
+            for (int i = 0; i < 16 && (stateNumber * 16 + i < bytes.length); i++) {
+                bytes[stateNumber * 16 + i] = statesList.get(stateNumber).matrix[(i % 4) * 4 + (i / 4)];
+            }
+        }
+
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
 }

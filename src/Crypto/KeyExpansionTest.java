@@ -1,5 +1,7 @@
 package Crypto;
 
+import java.util.List;
+
 // Требует, чтобы keysList в AES128 был доступен.
 public class KeyExpansionTest {
     public static void main(String[] args){
@@ -23,13 +25,19 @@ public class KeyExpansionTest {
         block.matrix[8] = (byte) 0xf6; block.matrix[9] = (byte) 0x30; block.matrix[10] = (byte) 0x98; block.matrix[11] = (byte) 0x07;
         block.matrix[12] = (byte) 0xa8; block.matrix[13] = (byte) 0x8d; block.matrix[14] = (byte) 0xa2; block.matrix[15] = (byte) 0x34;
 
-        System.out.println("незашифрованный блок");
+        System.out.println("Незашифрованный блок");
         System.out.println(Utils.toHexMatrix(block.matrix));
 
         cipher.encryptState(block);
 
         System.out.println("Зашифрованный блок");
         System.out.println(Utils.toHexMatrix(block.matrix));
+
+        Message msg = new Message("Hello 123 Привет 你好世界 こんにちは éëê \uD83D\uDC4B\uD83D\uDC4D\uD83D\uDE00\uD83D\uDD25\uD83D\uDCBB\uD83D\uDE80\uD83C\uDF0D");
+
+        List<State> stateList = msg.getStatesList();
+
+        System.out.println(Message.getMessage(stateList));
 
     }
 }
