@@ -217,7 +217,7 @@ public class AES128 {
      * @param block - блок, который будет зашифрован.
      */
     public void encryptState(State block) {
-        addRoundKey(block, keysList.get(0));
+        addRoundKey(block, keysList.getFirst());
 
         for (int roundNumber = 1; roundNumber <= 9; roundNumber++) {
             subBytes(block);
@@ -249,7 +249,7 @@ public class AES128 {
             reverseSubBytes(block);
         }
 
-        addRoundKey(block, keysList.get(0));
+        addRoundKey(block, keysList.getFirst());
     }
 
 
@@ -258,9 +258,9 @@ public class AES128 {
      */
     private static List<Key> keyExpansion(Key initialKey) {
         List<Key> keys = new ArrayList<>(11);
-        keys.add(0, new Key(16));
+        keys.addFirst(new Key(16));
 
-        System.arraycopy(initialKey.key, 0, keys.get(0).key, 0, 16);
+        System.arraycopy(initialKey.key, 0, keys.getFirst().key, 0, 16);
 
         for (int keyNumber = 1; keyNumber < 11; keyNumber++) {
             keys.add(keyNumber, new Key(16));

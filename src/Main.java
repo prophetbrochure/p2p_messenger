@@ -1,16 +1,18 @@
 import java.io.IOException;
 import java.util.Scanner;
 import Network.Server;
+import java.nio.charset.StandardCharsets;
 
 /**
  * <p>Основная точка входа в программу. (А чё, кому-то непонятно???)</p>
  */
 public class Main {
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
+
         // Титры, тоси, боси
         IO.printHelloMessage();
         IO.printMenu();
-        Scanner scanner = new Scanner(System.in);
         
         // Пока что это не Цикл вайл, вконце он break; специально.
         while (true) {

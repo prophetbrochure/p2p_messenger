@@ -4,12 +4,12 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 public class Key {
-    byte[] key;
+    public byte[] key;
 
     /**
      * @param keyLength длина ключа в байтах
      */
-    Key(int keyLength) {
+    public Key(int keyLength) {
         key = new byte[keyLength];
     }
 
@@ -26,7 +26,7 @@ public class Key {
     /**
      * <p>Заполняет массив байтов key случайными значениями.</p>
      */
-    void generateKey() {
+    public void generateKey() {
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(key);
     }
