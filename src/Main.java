@@ -16,37 +16,14 @@ public class Main {
         
         // Пока что это не Цикл вайл, вконце он break; специально.
         while (true) {
-            String choice = scanner.nextLine();
-            // String choice = "1"; // DEBUG
+            // String choice = scanner.nextLine();
+            String choice = "1"; // DEBUG
             if (choice.equals("1")) {
                 System.out.println("------- Start --------");
                 Server server;
                 while (true) {
-
+                    int port = IO.requestPort(scanner);
                     try {
-                        int port = 5000;
-                        System.out.println("Введите порт для входа.\n(5000 по умолчанию, нажми Enter)");
-                        while (true) {
-                            String input = scanner.nextLine();
-                            if (!input.isEmpty()) {
-                                System.err.println("input " + input);
-                                try {
-                                
-                                    port = Integer.parseInt(input);
-                                    if (port < 1 || port > 65535) {
-                                        throw new IllegalArgumentException("Порт должен быть от 1 до 65535 !");
-                                    } else {
-                                        break;
-                                    }
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Недопустимый порт. Вводите только цыфры.");
-                                } catch (IllegalArgumentException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                            } else {
-                                break;
-                            }
-                        } 
                         server = new Server(port);
                         break;
                     } catch (IOException e) {
@@ -54,9 +31,7 @@ public class Main {
                     }
                 }
 
-                System.out.println("1. Ожидать подключения.");
-                System.out.println("2. Подключиться к пользователю");
-                System.out.println("0. Выйти");
+                IO.printServerMenu();
                 choice = scanner.nextLine();
                 if (choice.equals("0")) {
                     break;
