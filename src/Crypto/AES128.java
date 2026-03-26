@@ -22,7 +22,7 @@ public class AES128 {
      * <p><h2><strong>Список из 11 раундовых {@link Key ключей}.</strong></h2></p>
      * <p>Генерируется из начального ключа с помощью {@link AES128#keyExpansion}</p>
      */
-    List<Key> keysList;
+    public List<Key> keysList;
 
     /**
      *

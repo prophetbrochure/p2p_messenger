@@ -16,7 +16,7 @@ public class Key {
     /**
      * Конструктор из готового массива байт
      */
-    Key(byte[] data) {
+    public Key(byte[] data) {
         if (data.length != 16) {
             throw new IllegalArgumentException("Key must be 16 bytes");
         }
