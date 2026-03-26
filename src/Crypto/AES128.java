@@ -252,65 +252,44 @@ public class AES128 {
         addRoundKey(block, keysList.get(0));
     }
 
+
     /**
      * <p><h2><strong>Генерирует список из 11 {@link Key ключей} для каждого из раундов шифрования</strong></h2></p>
-     */
-    /* Тут костыль на костыле. Я сначала реализовал keyExpansion, но он работал по строкам, а не по столбцам, как должен был.
-     * Прикрутил в начало транспонирование ключа, таким образом строки стали столбцами и наоборот.
      */
     private static List<Key> keyExpansion(Key initialKey) {
         List<Key> keys = new ArrayList<>(11);
         keys.add(0, new Key(16));
 
-        transpondMatrix(initialKey.key);
-
         System.arraycopy(initialKey.key, 0, keys.get(0).key, 0, 16);
-
 
         for (int keyNumber = 1; keyNumber < 11; keyNumber++) {
             keys.add(keyNumber, new Key(16));
             for (int wordNumber = 0; wordNumber < 4; wordNumber++) {
                 byte[] temp = new byte[4];
                 if (wordNumber == 0) {
-                    System.arraycopy(keys.get(keyNumber - 1).key, 12, temp, 0, 4);  // Последнее слово предыдущего раунда.
+                    temp[0] = keys.get(keyNumber - 1).key[7];    // Последнее слово предыдущего раунда со сдвигом вниз
+                    temp[1] = keys.get(keyNumber - 1).key[11];
+                    temp[2] = keys.get(keyNumber - 1).key[15];
+                    temp[3] = keys.get(keyNumber - 1).key[3];
 
-                    byte left = temp[0];    // Сдвиг на 1 влево (RotWord)
-                    temp[0] = temp[1];
-                    temp[1] = temp[2];
-                    temp[2] = temp[3];
-                    temp[3] = left;
 
-                    for (int i = 0; i < 4; i++) {   // SubBytes + XOR с константой раунда
+                    for (int i = 0; i < 4; i++) {   // SubBytes
                         temp[i] = Constants.SBOX[temp[i] & 0xFF];
                     }
-                    temp[0] ^= Constants.RCON[keyNumber - 1];
+                    temp[0] ^= Constants.RCON[keyNumber - 1];   //  XOR с константой раунда
 
-                } else {
-                    System.arraycopy(keys.get(keyNumber).key, 4 * (wordNumber - 1), temp, 0, 4);
+                } else {    // Слово под тем же номером, но из предыдущего раунда
+                    for(int i = 0; i < 4; i++) {
+                        temp[i] = keys.get(keyNumber - 1).key[i * 4 + wordNumber];
+                    }
                 }
 
                 for (int byteNumber = 0; byteNumber < 4; byteNumber++) {
-                    keys.get(keyNumber).key[4 * wordNumber + byteNumber] =
-                            (byte) (keys.get(keyNumber - 1).key[4 * wordNumber + byteNumber] ^ temp[byteNumber]);
+                    keys.get(keyNumber).key[4 * byteNumber + wordNumber] =
+                            (byte) (keys.get(keyNumber - 1).key[4 * byteNumber + wordNumber] ^ temp[byteNumber]);
                 }
             }
-            transpondMatrix(keys.get(keyNumber).key);
-
         }
         return keys;
-    }
-
-    /**
-     * <p><h2><strong>Транспонирование матрицы</strong></h2></p>
-     * @param matrix
-     */
-    private static void transpondMatrix(byte[] matrix){
-        for (int row = 0; row < 4; row++) {     // Транспонирование.
-            for (int column = 0; column < 4; column++) {
-                byte temp =  matrix[row * 4 + column];
-                matrix[row * 4 + column] = matrix[column * 4 + row];
-                matrix[column * 4 + row] = temp;
-            }
-        }
     }
 }
