@@ -13,7 +13,7 @@ public class Server {
     private List<Peer> peersList = new ArrayList<>();
     int reConnectionAttempts = 3;
 
-    Server(int port) throws IOException {
+    public Server(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
         System.out.println("Сервер создан на порту: " + port);
     }
@@ -23,6 +23,7 @@ public class Server {
         // который ждёт и обрабатывает подключения
         new Thread(new Runnable() {
             public void run() {
+                System.out.println("Ожидание подключения...");
                 while (true) {
                     try {
                         Socket socket = serverSocket.accept();
