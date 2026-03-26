@@ -1,4 +1,8 @@
-package Crypto;
+package Crypto.Testing;
+
+import Crypto.AES128_CTR_MAC;
+import Crypto.EncryptedMessage;
+import Crypto.Key;
 
 import java.util.Arrays;
 

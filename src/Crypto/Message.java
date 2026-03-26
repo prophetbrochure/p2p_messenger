@@ -8,7 +8,7 @@ public class Message {
     String string;
     byte[] paddedBytes;
 
-    Message(String string) {
+    public Message(String string) {
         this.string = string;
         byte[] unpaddedBytes = string.getBytes(StandardCharsets.UTF_8);
 
@@ -26,7 +26,7 @@ public class Message {
      *
      * @see State
      */
-    List<State> getStatesList() {
+    public List<State> getStatesList() {
         List<State> result = new ArrayList<>();
         int pointer = 0;
 
@@ -45,7 +45,7 @@ public class Message {
     /**
      * <p><h2><strong>Преобразует List<State> в String, с учётом padding'а</strong></h2></p>
      */
-    static String getMessage(List<State> statesList) {
+    public static String getMessage(List<State> statesList) {
         byte[] bytes = new byte[16 * statesList.size() - statesList.getLast().matrix[15]];
 
         for (int stateNumber = 0; stateNumber < statesList.size(); stateNumber++) {

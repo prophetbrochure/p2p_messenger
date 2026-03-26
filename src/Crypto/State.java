@@ -15,7 +15,7 @@ package Crypto;
 public class State {
     public byte[] matrix;
 
-    State() {
+    public State() {
         this.matrix = new byte[16];
     }
 
