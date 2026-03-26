@@ -278,9 +278,9 @@ public class AES128 {
                     }
                     temp[0] ^= Constants.RCON[keyNumber - 1];   //  XOR с константой раунда
 
-                } else {    // Слово под тем же номером, но из предыдущего раунда
-                    for(int i = 0; i < 4; i++) {
-                        temp[i] = keys.get(keyNumber - 1).key[i * 4 + wordNumber];
+                } else {    // Предыдущее слово
+                    for(int byteNumber = 0; byteNumber < 4; byteNumber++) {
+                        temp[byteNumber] = keys.get(keyNumber).key[byteNumber * 4 + (wordNumber - 1)];
                     }
                 }
 
