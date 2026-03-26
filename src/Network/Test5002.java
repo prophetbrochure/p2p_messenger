@@ -5,7 +5,7 @@ import java.io.IOException;
 public class Test5002 {
     Server server;
     public static void main(String[] args) {
-        // Отдающая сторона. покачто Может только писать собеседнику.
+        // Отдающая сторона.
         try {
             Server server = new Server(5002);
             
@@ -18,7 +18,6 @@ public class Test5002 {
             
         } catch (IOException e) {
             System.err.println("ошибка порт занят");
-            // e.printStackTrace();
         }
     }
 }
