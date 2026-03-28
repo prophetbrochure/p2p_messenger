@@ -15,7 +15,6 @@ public class Server {
 
     public Server(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
-        System.out.println("Сервер создан на порту: " + port);
     }
 
     public void start() {

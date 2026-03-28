@@ -1,6 +1,9 @@
 package Network;
 
 import java.net.Socket;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import java.io.BufferedReader;
@@ -14,95 +17,74 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 public class PeerHandler implements Runnable {
-    private Socket socket;
-    private Peer peer;
+    private final Socket socket;
+    private final Peer peer;
+    private Map<String, Command> commands = new HashMap<>();
 
     PeerHandler(Socket socket, Peer peer) {
         this.socket = socket;
         this.peer = peer;
+        commands.put("/history", new HistoryCommand(peer));
+        commands.put("/exit", new ExitCommand(peer, socket));
     }
 
     @Override
     public void run() {
-        
         new Thread(new Runnable() {
             public void run() {
-                try {
-                    
-                    System.out.println("\n------------- Начало чата -------------");
-                    InputStream input = socket.getInputStream();
-                    InputStreamReader iSReader = new InputStreamReader(input);
-                    BufferedReader reader = new BufferedReader(iSReader);
-        
-                    String message = "";
-                    try {
-                        while (!message.equals("/exit")) {
-                            message = reader.readLine();
-                            System.out.println("[" + socket.getLocalAddress() + "]: " + message);
-                            peer.getHistory().add("[" + socket.getLocalAddress() + "]: " + message);
-                        }
-                        reader.close();
-                        iSReader.close();
-                        input.close();
-                        socket.close();
-                        System.out.println("Собеседник покинул чат. Нажмите Enter...");
-                    } catch (IOException e1) {
-                        reader.close();
-                        iSReader.close();
-                        input.close();
-                        socket.close();
-                        System.out.println("Собеседник покинул чат. Нажмите Enter...");
+                System.out.println("\n------------- Начало чата -------------");
+                String message = "";
+
+                try (InputStream input = socket.getInputStream();
+                        InputStreamReader iSReader = new InputStreamReader(input);
+                        BufferedReader reader = new BufferedReader(iSReader);) {
+
+                    while (!message.equals("/exit")) {
+                        message = reader.readLine();
+                        System.out.println("[" + socket.getLocalAddress() + "]: " + message);
+                        peer.getHistory().add("[" + socket.getLocalAddress() + "]: " + message);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    socket.close();
+                    System.out.println("Собеседник покинул чат. Нажмите Enter...");
+
+                } catch (IOException e1) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Собеседник покинул чат. Нажмите Enter...");
                 }
             }
         }).start();
 
-        try {
-            
-            OutputStream output = socket.getOutputStream();
-            OutputStreamWriter oSWriter = new OutputStreamWriter(output);
-            BufferedWriter writer = new BufferedWriter(oSWriter);
-            
-            System.out.println("Введите '/exit' чтобы отключиться.");
-            System.out.println("Введите '/history' чтобы вывести историю чата.");
-            Scanner scanner = new Scanner(System.in);
-            
-            String message = "";
-            try {
-                while (!message.equals("/exit")) {
-                    message = scanner.nextLine();
-                    if (message.equals("/history")) {
-                        int i = 1;
-                        System.out.println("\n--------------- History ---------------");
-                        for (String line : peer.getHistory()) {
-                            System.out.println(i++ + ") " + line);
-                        }
-                        continue;
-                    }
+        System.out.println("Введите '/exit' чтобы отключиться.");
+        System.out.println("Введите '/history' чтобы вывести историю чата.");
+        String message = "";
+
+        try (OutputStream output = socket.getOutputStream();
+                OutputStreamWriter oSWriter = new OutputStreamWriter(output);
+                BufferedWriter writer = new BufferedWriter(oSWriter);
+                Scanner scanner = new Scanner(System.in)) {
+
+            while (peer.isConnected()) {
+                message = scanner.nextLine();
+                Command command = commands.get(message);
+                if (command == null) {
                     writer.write(message);
                     writer.newLine();
                     writer.flush();
                     peer.getHistory().add("[Me]: " + message);
+                } else {
+                    command.execute();
                 }
-                System.out.println("Чат закрывается.");
-                
-                scanner.close();
-                writer.close();
-                oSWriter.close();
-                output.close();
-                socket.close();
-                
-            } catch (IOException e1) {
-                scanner.close();
-                writer.close();
-                oSWriter.close();
-                output.close();
-                socket.close();
             }
-        } catch (IOException e) {
-            System.err.println("eror");
+        } catch (IOException e1) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

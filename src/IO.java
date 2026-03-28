@@ -4,6 +4,7 @@ import java.util.Scanner;
  * Класс для работы с вводом/выводом.
  */
 public class IO {
+    private static final int DEFAULT_PORT = 5000;
 
     // INPUT
     public static String requestUsername(Scanner scanner) {
@@ -17,29 +18,27 @@ public class IO {
     }
 
     public static int requestPort(Scanner scanner) {
-        System.out.println("Введи port пользователя");
-        int port = 5000;
-        System.out.println("Введите порт.\n(5000 по умолчанию, нажми Enter)");
+        System.out.println("Введите порт.\n(" + DEFAULT_PORT + " по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
-            if (!input.isEmpty()) {
-                try {
-                    port = Integer.parseInt(input);
-                    if (port < 1 || port > 65535) {
-                        throw new IllegalArgumentException("Порт должен быть от 1 до 65535 !");
-                    } else {
-                        break;
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Недопустимый порт. Вводите только цыфры.");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            } else {
-                break;
+            try {
+                return getPort(input);
+            } catch (NumberFormatException e) {
+                System.err.println("Ошибка. Порт должен состоять только из цыфр");
             }
         }
-        return port;
+    }
+
+    public static int getPort(String input) {
+        if (input.isEmpty()) {
+            return DEFAULT_PORT;
+        }
+        int port = Integer.parseInt(input);
+        if (port < 1 || port > 65535) {
+            throw new IllegalArgumentException("Порт должен быть от 1 до 65535 !");
+        } else {
+            return port;
+        }
     }
 
     // OUTPUT

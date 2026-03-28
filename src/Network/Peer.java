@@ -6,24 +6,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Peer {
-    private InetAddress ip;
-    private int port;
+    private final InetAddress ip;
+    private final int port;
     private List<String> history = new ArrayList<>();
+    private boolean isConnected;
 
     Peer(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
+        this.isConnected = true;
     }
 
     InetAddress getIp() {
-        return this.ip;
+        return ip;
     }
 
     int getPort() {
-        return this.port;
+        return port;
     }
 
     List<String> getHistory() {
-        return this.history;
+        return history;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 }
