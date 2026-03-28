@@ -10,8 +10,9 @@ import java.util.ArrayList;
 
 public class Server {
     private ServerSocket serverSocket;
-    private List<Peer> peersList = new ArrayList<>();
-    int reConnectionAttempts = 3;
+    private int reConnectionAttempts = 3;
+    public static List<PeerHandler> peersList = new ArrayList<>();
+    public static boolean chatOpened = false;
 
     public Server(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
@@ -29,8 +30,9 @@ public class Server {
                         System.out.println("Входящее подключение: " + socket.getLocalAddress());
 
                         Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
-                        peersList.add(peer);
-                        new Thread(new PeerHandler(socket, peer)).start();
+                        PeerHandler peerHandler = new PeerHandler(socket, peer);
+                        peerHandler.run();
+                        peersList.add(peerHandler);
                     } catch (IOException e) {
                         System.out.println("\n\nEROR\n\nНеразу не ловил эту ошибку ещё");
                     }
@@ -45,8 +47,10 @@ public class Server {
 
             Socket socket = new Socket(ip, port);
             Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
-            peersList.add(peer);
-            new Thread(new PeerHandler(socket, peer)).start();
+            PeerHandler peerHandler = new PeerHandler(socket, peer);
+            peerHandler.run();
+            peersList.add(peerHandler);
+            peerHandler.run2();
 
         } catch (IOException e) {
             // Попытка переподключения

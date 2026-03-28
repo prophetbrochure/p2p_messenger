@@ -9,15 +9,15 @@ public class Peer {
     private final InetAddress ip;
     private final int port;
     private List<String> history = new ArrayList<>();
-    private boolean isConnected;
+    private boolean isActive;
 
     Peer(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.isConnected = true;
+        this.isActive = true;
     }
 
-    InetAddress getIp() {
+    public InetAddress getIp() {
         return ip;
     }
 
@@ -29,11 +29,13 @@ public class Peer {
         return history;
     }
 
-    public boolean isConnected() {
-        return isConnected;
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setConnected(boolean connected) {
-        isConnected = connected;
+    // TODO в новой реализации, где пир либо актив либо нет, название connected
+    // не корректно новерное
+    public void setActive(boolean connected) {
+        isActive = connected;
     }
 }

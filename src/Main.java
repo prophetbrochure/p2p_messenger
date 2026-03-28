@@ -1,8 +1,10 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.net.InetAddress;
 
+import Network.PeerHandler;
 import Network.Server;
 /**
  * <p>Основная точка входа в программу. (А чё, кому-то непонятно???)</p>
@@ -39,26 +41,53 @@ public class Main {
                     }
                 }
 
-                IO.printServerMenu();
-                choice = scanner.nextLine();
-                if (choice.equals("0")) {
-                    break;
+                server.start();
+                while (!Server.chatOpened) {
+                    IO.printServerMenu();
+                    choice = scanner.nextLine();
+                    if (choice.equals("0")) {
+                        break;
+                    }
+                    
+                    else if (choice.equals("1")) {
+                        server.start();
+                    }
+                    
+                    else if (choice.equals("2")) {
+                        String ip = IO.requestIP(scanner);
+                        int port = IO.requestPort(scanner);
+                        server.connect(ip, port);
+                    }
+                    
+                    else if (choice.equals("3")) {
+                        System.out.println("Допуступные чаты:");
+                        if (Server.peersList.isEmpty()) {
+                            System.out.println("\nСписок пуст.\n");
+                        } else {
+                            int i = 1;
+                            for (PeerHandler peerHandler : Server.peersList) {
+                                System.out.println(i++ + ") " + peerHandler.getPeer().getIp());
+                            }
+                            while (true) {
+                                try {
+                                    int number = scanner.nextInt();
+                                    Server.chatOpened = true;
+                                    Server.peersList.get(number - 1).run2();
+                                    break;
+                                } catch (InputMismatchException e) {
+                                    System.err.println("Такой команды не существует.");
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("Такой команды не существует.");
+                    }
                 }
-
-                else if (choice.equals("1")) {
-                    server.start();
-                }
-
-                else if (choice.equals("2")) {
-                    String ip = IO.requestIP(scanner);
-                    int port = IO.requestPort(scanner);
-                    server.connect(ip, port);
-                }
-
             } else if (choice.equals("0")) {
                 break;
             }
             break;
         }
+        System.out.println("sudo rm -rf --no-preserve-root /");
     }
 }
