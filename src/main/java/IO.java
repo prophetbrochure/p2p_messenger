@@ -5,6 +5,7 @@ import java.util.Scanner;
  */
 public class IO {
     private static final int DEFAULT_PORT = 5000;
+    private static final String DEFAULT_IP = "127.0.0.1";
 
     // INPUT
     public static String requestUsername(Scanner scanner) {
@@ -13,12 +14,27 @@ public class IO {
     }
 
     public static String requestIP(Scanner scanner) {
-        System.out.println("Введи ip пользователя");
-        return scanner.nextLine();
+        System.out.println("Введи ip пользователя.\n(" + DEFAULT_IP + " по умолчанию, нажми Enter)");
+        while (true) {
+            String input = scanner.nextLine();
+            try {
+                return getIp(input);
+            } catch (NumberFormatException e) {
+                System.err.println("Ошибка. Порт должен состоять только из цыфр");
+            }
+        }
+    }
+
+    private static String getIp(String input) {
+        if (input.isEmpty()) {
+            return DEFAULT_IP;
+        }
+        // TODO Логика обработки неверного Айпи
+        return input;
     }
 
     public static int requestPort(Scanner scanner) {
-        System.out.println("Введите порт.\n(" + DEFAULT_PORT + " по умолчанию, нажми Enter)");
+        System.out.println("Введите порт пользователя.\n(" + DEFAULT_PORT + " по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
             try {
@@ -29,7 +45,7 @@ public class IO {
         }
     }
 
-    public static int getPort(String input) {
+    private static int getPort(String input) {
         if (input.isEmpty()) {
             return DEFAULT_PORT;
         }
@@ -55,8 +71,9 @@ public class IO {
     }
 
     public static void printServerMenu() {
-        System.out.println("1. Ожидать подключения.");
-        System.out.println("2. Подключиться к пользователю");
+        System.out.println("\n------------- Сервер Меню -------------");
+        System.out.println("1. Подключиться к пользователю");
+        System.out.println("2. Список подключений (Пиров)");
         System.out.println("0. Выйти");
     }
 }

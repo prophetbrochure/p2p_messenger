@@ -12,7 +12,7 @@ public class Test5002 {
             server.start();
 
             String ip = "127.0.0.1";
-            int port = 5001;
+            int port = 5000;
 
             server.connect(ip, port);
             
