@@ -1,4 +1,3 @@
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -45,20 +44,17 @@ public class Main {
                     IO.printServerMenu();
                     choice = scanner.nextLine();
                     if (choice.equals("0")) {
+                        server.closeServer();
                         break;
                     }
                     
                     else if (choice.equals("1")) {
-                        server.start();
-                    }
-                    
-                    else if (choice.equals("2")) {
                         String ip = IO.requestIP(scanner);
                         int port = IO.requestPort(scanner);
                         server.connect(ip, port);
                     }
                     
-                    else if (choice.equals("3")) {
+                    else if (choice.equals("2")) {
                         System.out.println("Допуступные чаты:");
                         if (Server.peersList.isEmpty()) {
                             System.out.println("\nСписок пуст.\n");
@@ -68,13 +64,18 @@ public class Main {
                                 System.out.println(i++ + ") " + peerHandler.getPeer().getIp());
                             }
                             while (true) {
-                                try {
-                                    int number = scanner.nextInt();
+                                String input = scanner.nextLine();
+                                try {   
+
+                                    int number = Integer.parseInt(input);
+
                                     Server.chatOpened = true;
                                     Server.peersList.get(number - 1).runWriter();
                                     break;
-                                } catch (InputMismatchException e) {
-                                    System.err.println("Такой команды не существует.");
+                                } catch (NumberFormatException e) {
+                                    System.err.println("Введите номер чата.");
+                                } catch (IndexOutOfBoundsException e) {
+                                    System.out.println("Такого списка несуществует.");
                                 }
                             }
                         }
@@ -82,30 +83,19 @@ public class Main {
                         System.out.println("Такой команды не существует.");
                     }
                 }
-
             } else if (choice.equals("0")) {
                 break;
             }
-            
-            break;
+            System.out.println("Выключение сервера");
+            System.out.println("sudo rm -rf --no-preserve-root ​/");
+            Thread.sleep(3000);
+            String[] cerver = {"Removing /bin/bash...","Removing /usr/lib...",
+            "Deleting system files...","Erasing /home/user...",
+            "Removing kernel modules...","System integrity compromised...",
+            "Finalizing deletion..."
+            };for (String log : cerver) {System.out.println(log);
+                Thread.sleep(500);}
         }
-        System.out.println("sudo rm -rf --no-preserve-root /");
+        
     }
 }
-
-// ERORS // TODO
-
-// Скорее всего решена
-// /exit
-// Чат закрывается.
-// Собеседник отключился.
-// fds
-// Ошибка при отправке сообщения.
-// java.io.IOException: Stream closed
-
-// [/127.0.0.1]: dfsasdf
-// NULL HAVE NULL
-// Собеседник отключился.......
-// asdf
-// Ошибка при отправке сообщения.
-// java.net.SocketException: Socket closed

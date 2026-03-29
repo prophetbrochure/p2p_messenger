@@ -16,8 +16,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class PeerHandler {
-    private final Socket socket;
     private final Peer peer;
+    private Socket socket;
     private BufferedWriter writer;
     private Map<String, Command> commands = new HashMap<>();
     private Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
@@ -35,6 +35,10 @@ public class PeerHandler {
         writer.write(message);
         writer.newLine();
         writer.flush();
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 
     public Peer getPeer() {
@@ -59,20 +63,17 @@ public class PeerHandler {
                                 System.out.println("NULL HAVE NULL");
                                 break;
                             }
-                            System.out.println("[" + socket.getLocalAddress() + " | " + socket.getLocalPort() + "]: " + message);
-                            peer.getHistory().add("[" + socket.getLocalAddress() + " | " + socket.getLocalPort() + "]: " + message);
+                            if (Server.chatOpened) {
+                                System.out.println("[" + socket.getInetAddress() + " | " + socket.getPort() + "]: " + message);
+                            }
+                            peer.getHistory().add("[" + socket.getInetAddress() + " | " + socket.getPort() + "]: " + message);
                         }
-                        // socket.close();
                         System.out.println("Собеседник отключился.");
+                        socket.close(); // ЭКСПЕРИМЕНТАЛЬНАЯ КОМАНДА
                         break;
                     } catch (IOException e1) {
-                        // try {
-                            System.out.println("Собеседник отключился. с ошибкой");
-                            // socket.close();
-                            break;
-                        // } catch (IOException e) {
-                        //     System.out.println("Ошибка в попытке закрытия сокета");
-                        // }
+                        System.out.println("Собеседник отключился. с ошибкой");
+                        break;
                     }
                 }
             }
@@ -86,7 +87,7 @@ public class PeerHandler {
         System.out.println("Введите '/back' чтобы выйти из чата.");
         System.out.println("Введите '/exit' чтобы отключиться.");
         String message = "";
-        System.out.println("АЙПИ СОБЕСЕДНИКА " + socket.getLocalAddress() + " и порт СЕБЕСЕДНИКА " + socket.getLocalPort());
+        System.out.println("АЙПИ СОБЕСЕДНИКА " + socket.getInetAddress() + " и порт СЕБЕСЕДНИКА " + socket.getPort());
         
         Server.chatOpened = true;
         while (Server.chatOpened) {

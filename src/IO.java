@@ -72,9 +72,8 @@ public class IO {
 
     public static void printServerMenu() {
         System.out.println("\n------------- Сервер Меню -------------");
-        System.out.println("1. Ожидать подключения.");
-        System.out.println("2. Подключиться к пользователю");
-        System.out.println("3. Список подключений(Пиров)");
+        System.out.println("1. Подключиться к пользователю");
+        System.out.println("2. Список подключений (Пиров)");
         System.out.println("0. Выйти");
     }
 }
