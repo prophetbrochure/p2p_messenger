@@ -22,11 +22,10 @@ public class Main {
             InetAddress localHost = InetAddress.getLocalHost();
             String myAddress = localHost.getHostAddress();
 
-            String choice = scanner.nextLine();
-            // String choice = "1"; // DEBUG
+            // String choice = scanner.nextLine();
+            String choice = "1"; // DEBUG
             if (choice.equals("1")) {
                 System.out.println("------- Start --------");
-                System.out.println("Your IP: " + myAddress);
 
                 Server server;
                 while (true) {
@@ -72,7 +71,7 @@ public class Main {
                                 try {
                                     int number = scanner.nextInt();
                                     Server.chatOpened = true;
-                                    Server.peersList.get(number - 1).run2();
+                                    Server.peersList.get(number - 1).runWriter();
                                     break;
                                 } catch (InputMismatchException e) {
                                     System.err.println("Такой команды не существует.");
@@ -83,11 +82,30 @@ public class Main {
                         System.out.println("Такой команды не существует.");
                     }
                 }
+
             } else if (choice.equals("0")) {
                 break;
             }
+            
             break;
         }
         System.out.println("sudo rm -rf --no-preserve-root /");
     }
 }
+
+// ERORS // TODO
+
+// Скорее всего решена
+// /exit
+// Чат закрывается.
+// Собеседник отключился.
+// fds
+// Ошибка при отправке сообщения.
+// java.io.IOException: Stream closed
+
+// [/127.0.0.1]: dfsasdf
+// NULL HAVE NULL
+// Собеседник отключился.......
+// asdf
+// Ошибка при отправке сообщения.
+// java.net.SocketException: Socket closed

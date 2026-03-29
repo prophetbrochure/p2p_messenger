@@ -29,10 +29,22 @@ public class Server {
                         Socket socket = serverSocket.accept();
                         System.out.println("Входящее подключение: " + socket.getLocalAddress());
 
-                        Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
-                        PeerHandler peerHandler = new PeerHandler(socket, peer);
-                        peerHandler.run();
-                        peersList.add(peerHandler);
+                        if (!peersList.isEmpty()) {
+                            for (PeerHandler peerHandler : peersList) {
+                                System.out.println("Просматриваем пирлист");
+                                Peer peer = peerHandler.getPeer();
+                                if (peer.getIp().equals(socket.getLocalAddress()) & peer.getPort() == socket.getLocalPort()) {
+                                    System.out.println("ВХОДЯЩЕЕ: Такой пользователь уже был подключен. Подключам снова ");
+                                    peerHandler.run();
+                                    // peerHandler.runWriter();
+                                }
+                            }
+                        } else {
+                            Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
+                            PeerHandler peerHandler = new PeerHandler(socket, peer);
+                            peerHandler.run();
+                            peersList.add(peerHandler);
+                        }
                     } catch (IOException e) {
                         System.out.println("\n\nEROR\n\nНеразу не ловил эту ошибку ещё");
                     }
@@ -45,26 +57,41 @@ public class Server {
         System.out.println("Попытка подключиться к: " + ip);
         try {
 
-            Socket socket = new Socket(ip, port);
-            Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
-            PeerHandler peerHandler = new PeerHandler(socket, peer);
-            peerHandler.run();
-            peersList.add(peerHandler);
-            peerHandler.run2();
+            if (!peersList.isEmpty()) {
+                for (PeerHandler peerHandler : peersList) {
+                    System.out.println("Просматриваем пирлист");
+                    Peer peer = peerHandler.getPeer();
+                    System.out.println("Новый " + ip + " и порт" + port + "\n\n");
+                    System.out.println("Старый " + peer.getIp() + " и порт" + peer.getPort());
 
-        } catch (IOException e) {
-            // Попытка переподключения
-            try {
-                if (reConnectionAttempts-- > 0) {
-                    System.out.println("Неудалось.\n");
-                    Thread.sleep(3000);
-                    connect(ip, port);
-                } else {
-                    System.out.println("Введён неверный Адрес, или пользователь не в сети.");
+                    if (peer.getIp().equals(ip) & peer.getPort() == port) {
+                        System.out.println("Такой пользователь уже был подключен. Подключам снова");
+                        peerHandler.run();
+                        // peerHandler.runWriter();
+                    }
                 }
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+            } else {
+                Socket socket = new Socket(ip, port);
+                Peer peer = new Peer(socket.getLocalAddress(), socket.getLocalPort());
+                PeerHandler peerHandler = new PeerHandler(socket, peer);
+                peerHandler.run();
+                peersList.add(peerHandler);
+                peerHandler.runWriter();
             }
+                
+            } catch (IOException e) {
+                // Попытка переподключения
+                try {
+                    if (reConnectionAttempts-- > 0) {
+                        System.out.println("Неудалось.\n");
+                        Thread.sleep(3000);
+                        connect(ip, port);
+                    } else {
+                        System.out.println("Введён неверный Адрес, или пользователь не в сети.");
+                    }
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
         }
     }
 }

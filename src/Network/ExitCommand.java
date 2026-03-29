@@ -17,7 +17,8 @@ public class ExitCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Чат закрывается.");
+        System.out.println("Отключение собеседника.");
+        Server.chatOpened = false;
         peer.setActive(false);
         try {
             writer.close();

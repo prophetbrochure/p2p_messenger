@@ -11,7 +11,7 @@ public class Peer {
     private List<String> history = new ArrayList<>();
     private boolean isActive;
 
-    Peer(InetAddress ip, int port) {
+    public Peer(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
         this.isActive = true;
@@ -21,7 +21,7 @@ public class Peer {
         return ip;
     }
 
-    int getPort() {
+    public int getPort() {
         return port;
     }
 
