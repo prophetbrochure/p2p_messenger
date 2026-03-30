@@ -2,7 +2,7 @@ package Crypto;
 
 import java.math.BigInteger;
 
-class Constants {
+public class Constants {
     /**
      * <p><h2><strong>Таблица замены. Содержит 256 значений для каждого байта.</strong></h2></p>
      * <p>Используется в {@link AES128#subBytes}</p>
@@ -92,12 +92,12 @@ class Constants {
     /**
      * <p><h2><strong>Генератор (основание степени) для {@link DH протокола Диффи-Хеллмана}</strong></h2></p>
      */
-    static final BigInteger generator = new BigInteger("2");
+    public static final BigInteger generator = new BigInteger("2");
 
     /**
      * <p><h2><strong>Модуль для {@link DH протокола Диффи-Хеллмана}</strong></h2></p>
      */
-    static final BigInteger module = new BigInteger(
+    public static final BigInteger module = new BigInteger(
             "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
                     "29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
                     "EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
@@ -132,5 +132,40 @@ class Constants {
             0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3, 0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070,
             0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5, 0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3,
             0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208, 0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
+    };
+
+    /**
+     * <p><h2><strong>ipad (inner padding) - константа для {@link HKDF#HMAC HMAC}</strong></h2></p>
+     */
+    static final byte[] ipad = new byte[]{
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+            (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36, (byte) 0x36,
+    };
+
+    /**
+     * <p><h2><strong>ipad (outer padding) - константа для {@link HKDF#HMAC HMAC}</strong></h2></p>
+     */
+    static final byte[] opad = new byte[]{
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+            (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c,
+    };
+
+    public static final byte[] defaultSalt = new byte[]{
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
     };
 }

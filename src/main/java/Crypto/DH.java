@@ -34,14 +34,14 @@ public class DH {
      *
      * @param publicKeyB - публичный ключ собеседника.
      */
-    public void generateKey(BigInteger publicKeyB) {
+    public void generateSharedSecret(BigInteger publicKeyB) {
         sharedSecret = publicKeyB.modPow(privateKey, module);
     }
 
     /**
      * <p><h2><strong>Возвращает общий секрет.</strong></h2></p>
      */
-    public BigInteger getSharedSecret() {
-        return sharedSecret;
+    public byte[] getSharedSecret() {
+        return sharedSecret.toByteArray();
     }
 }

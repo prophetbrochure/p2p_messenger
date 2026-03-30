@@ -1,5 +1,7 @@
 package Crypto;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * <p><h2><strong>HMAC-based Key Derivation Function - <br>
  * Позволяет получать ключи нужной длины из общего секрета.
@@ -9,20 +11,20 @@ package Crypto;
  * Используется HMAC + SHA-256
  *
  * Из Изначального секрета любой длины генерируется промежуточный ключ
- * (PRK — pseudorandom key) длиной 256 бит
+ * (PRK — pseudorandom key) длиной 32 байта (256 бит)
  * PRK=HMAC(salt,input keying material)
  * Где input keying material получен в результате DH
  * salt - случайная или заранее созданная соль, публичная.
  *
  * Формула Hmac:
  * HMAC(K,m) = H ((K′⊕ opad) ∥ H((K′ ⊕ ipad) ∥ m)
- * ∥ - конкатенация
+ * ∥ - конкатенация, ⊕ - XOR
  * opad, ipad - константы
  * K  - PRK
- * K' - PRK, расширенный до 512 байт
- * H  - хэш-функция (sha-256), возвращает 256 бит
+ * K' - PRK, расширенный до 64 байт (512 бит)
+ * H  - хэш-функция (sha-256), возвращает 32 байта (256 бит)
  *
- * Extract:
+ * Expand (Получение ключа):
  * T0 = ∅
  * T1 = HMAC(PRK, T0 ∥ info ∥ 0x01)
  * T2 = HMAC(PRK, T1 ∥ info ∥ 0x02)
@@ -33,6 +35,22 @@ package Crypto;
  * </pre>
  */
 public class HKDF {
+    private final byte[] PRK;
+    private byte[] lastGeneratedKey;
+    private int keyCounter;
+
+    public HKDF(byte[] salt, byte[] inputKeyingMaterial) {
+        this.PRK = HMAC(salt, inputKeyingMaterial);
+        this.lastGeneratedKey = new byte[0];
+        this.keyCounter = 1;
+    }
+
+    public HKDF(byte[] inputKeyingMaterial) {
+        this.PRK = HMAC(Constants.defaultSalt, inputKeyingMaterial);
+        this.lastGeneratedKey = new byte[0];
+        this.keyCounter = 1;
+    }
+
 
     //  чёт ниче не придумал пока
 
@@ -106,7 +124,7 @@ public class HKDF {
      * @param blockSize Размер блока, которому будет кратный получившийся массив.
      * @return paddedArray - массив, кратный длине блока, в котором последние 8 бит - длина исходного массива.
      */
-    byte[] getPaddedArray(byte[] data, int blockSize) {
+    private byte[] getPaddedArray(byte[] data, int blockSize) {
         int paddingSize = blockSize - (data.length + 8) % blockSize;    //  +8 для длины data в конце
 
         byte[] paddedArray = new byte[data.length + paddingSize + 8];
@@ -128,11 +146,11 @@ public class HKDF {
      * @param array массив
      * @param index индекс, с которого начинается слово
      */
-    int getWord(byte[] array, int index) {
-        return ((array[index]     & 0xFF) << 24) |
+    private int getWord(byte[] array, int index) {
+        return ((array[index] & 0xFF) << 24) |
                 ((array[index + 1] & 0xFF) << 16) |
-                ((array[index + 2] & 0xFF) << 8)  |
-                (array[index + 3]  & 0xFF);
+                ((array[index + 2] & 0xFF) << 8) |
+                (array[index + 3] & 0xFF);
     }
 
     /**
@@ -141,7 +159,7 @@ public class HKDF {
      * @param x     слово
      * @param shift величина сдвига
      */
-    int rotr(int x, int shift) {
+    private int rotr(int x, int shift) {
         return (x >>> shift) | (x << (32 - shift));
     }
 
@@ -151,14 +169,14 @@ public class HKDF {
      * @param x     слово
      * @param shift величина сдвига
      */
-    int shr(int x, int shift) {
+    private int shr(int x, int shift) {
         return x >>> shift;
     }
 
     /**
      * <p><h2><strong>Соединяет слова (int) в массив байтов</strong></h2></p>
      */
-    byte[] concat(int... numbers) {
+    private byte[] concat(int... numbers) {
         byte[] result = new byte[numbers.length * 4];
         for (int i = 0; i < numbers.length; i++) {
             result[4 * i] = (byte) (numbers[i] >>> 24);
@@ -166,6 +184,72 @@ public class HKDF {
             result[4 * i + 2] = (byte) (numbers[i] >>> 8);
             result[4 * i + 3] = (byte) (numbers[i]);
         }
+        return result;
+    }
+
+    /**
+     * <p><h2><strong>Как sha-256, но принимает ключ, и криптографически стойкая</strong></h2></p>
+     * <p><pre>
+     *     Формула:
+     *     HMAC(K,m) = H ( (K′⊕ opad) ∥ H(K′ ⊕ ipad ∥ m) )
+     * </pre></p>
+     *
+     * @param key 32-байтовый ключ
+     */
+    public byte[] HMAC(byte[] key, byte[] message) {
+        byte[] K = new byte[64];
+        System.arraycopy(key, 0, K, 0, 32);
+
+        return sha256(concat(XOR(K, Constants.opad), sha256(concat(XOR(K, Constants.ipad), message))));
+    }
+
+    /**
+     * <p><h2><strong>Соединяет массивы byte[]</strong></h2></p>
+     *
+     * @param arrays любое число массивов byte[]
+     * @return byte[] result
+     */
+    private byte[] concat(byte[]... arrays) {
+        int totalLength = 0;
+        for (byte[] i : arrays) {
+            totalLength += i.length;
+        }
+        byte[] result = new byte[totalLength];
+        int currentIndex = 0;
+        for (byte[] array : arrays) {
+            System.arraycopy(array, 0, result, currentIndex, array.length);
+            currentIndex += array.length;
+        }
+        return result;
+    }
+
+    /**
+     * <p><h2><strong>Побайтовый XOR массивов</strong></h2></p>
+     */
+    private byte[] XOR(byte[] A, byte[] B) {
+        byte[] result = new byte[A.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (byte) (A[i] ^ B[i]);
+        }
+        return result;
+    }
+
+    /**
+     * <p><h2><strong>Получение ключа нужной длины</strong></h2></p>
+     *
+     * @param info             тип ключа (например, MAC)
+     * @param desiredKeyLength длина ключа (максимум 32 байта)
+     */
+    public Key getKey(String info, int desiredKeyLength) {
+        byte[] T = HMAC(PRK, concat(lastGeneratedKey, info.getBytes(StandardCharsets.UTF_8), new byte[]{(byte) keyCounter}));
+
+        Key result = new Key(desiredKeyLength);
+
+        System.arraycopy(T, 0, result.key, 0, desiredKeyLength);
+
+        keyCounter++;
+        lastGeneratedKey = T;
+
         return result;
     }
 }
