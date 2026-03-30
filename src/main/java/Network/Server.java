@@ -102,7 +102,7 @@ public class Server {
             // Попытка переподключения
             try {
                 if (reConnectionAttempts-- > 0) {
-                    System.out.println("Неудалось.\n");
+                    System.out.println("Не удалось.\n");
                     Thread.sleep(3000);
                     connect(ip, port, Username);
                 } else {
