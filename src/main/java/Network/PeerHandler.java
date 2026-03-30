@@ -28,7 +28,7 @@ public class PeerHandler {
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         commands.put("/history", new HistoryCommand(peer));
         commands.put("/exit", new ExitCommand(peer, socket, writer));
-        commands.put("/back", new BackCommand());
+        commands.put("/back", new BackComman());
     }
 
     public void send(String message) throws IOException {
@@ -48,15 +48,25 @@ public class PeerHandler {
     public void run() {
         new Thread(new Runnable() {
             public void run() {
-                System.out.println("\n------------- Чтение -------------");
+
                 String message = "";
-
                 while (true) {
-
                     try (InputStream input = socket.getInputStream();
                     InputStreamReader iSReader = new InputStreamReader(input);
                     BufferedReader reader = new BufferedReader(iSReader);) {
                         
+                        if (peer.getUsername() == null) {
+                            String Username = "";
+                            message = reader.readLine();
+                            if (message.contains("|UsErNaMe|")) {
+                                message = message.replace("|UsErNaMe|", "");
+                                Username = message;
+                                peer.setUsername(Username);
+                                // System.out.println("Username собеседника: " + peer.getUsername());
+                            }
+                        } else {
+                            reader.readLine();
+                        }
                         while (!message.equals("/exit")) {
                             message = reader.readLine();
                             if (message == null) {
@@ -64,9 +74,9 @@ public class PeerHandler {
                                 break;
                             }
                             if (Server.chatOpened) {
-                                System.out.println("[" + socket.getInetAddress() + " | " + socket.getPort() + "]: " + message);
+                                System.out.println("[" + peer.getUsername() + " | " + socket.getInetAddress() + "]: " + message);
                             }
-                            peer.getHistory().add("[" + socket.getInetAddress() + " | " + socket.getPort() + "]: " + message);
+                            peer.getHistory().add("[" + peer.getUsername() + " | " + socket.getInetAddress() + "]: " + message);
                         }
                         System.out.println("Собеседник отключился.");
                         socket.close(); // ЭКСПЕРИМЕНТАЛЬНАЯ КОМАНДА
@@ -80,16 +90,23 @@ public class PeerHandler {
         }).start();
     }
         
-    public void runWriter() {
+    public void runWriter(String Username) {
         
         System.out.println("\n------------- Начало чата -------------");
         System.out.println("Введите '/history' чтобы вывести историю чата.");
         System.out.println("Введите '/back' чтобы выйти из чата.");
         System.out.println("Введите '/exit' чтобы отключиться.");
-        String message = "";
         System.out.println("АЙПИ СОБЕСЕДНИКА " + socket.getInetAddress() + " и порт СЕБЕСЕДНИКА " + socket.getPort());
+        String message = "";
         
         Server.chatOpened = true;
+        if (peer.getUsername() == null) {
+            try {
+                send("|UsErNaMe|" + Username);
+            } catch (IOException e) {
+                System.out.println("Пользователь не в сети.");
+            }
+        }
         while (Server.chatOpened) {
             message = scanner.nextLine();
             Command command = commands.get(message);
@@ -100,7 +117,6 @@ public class PeerHandler {
                 } catch (IOException e) {
                     System.err.println("Ошибка при отправке сообщения. Сохранено в истории.");
                     peer.getHistory().add("[Me]: " + message);
-                    // e.printStackTrace();
                 }
             } else {
                 command.execute();

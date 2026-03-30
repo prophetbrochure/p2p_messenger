@@ -1,3 +1,5 @@
+package app;
+
 import java.util.Scanner;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +22,7 @@ public class Main {
         while (true) {
             InetAddress localHost = InetAddress.getLocalHost();
             String myAddress = localHost.getHostAddress();
+            String Username;
 
             // String choice = scanner.nextLine();
             String choice = "1"; // DEBUG
@@ -29,17 +32,20 @@ public class Main {
                 Server server;
                 while (true) {
                     int port = IO.requestPort(scanner);
+                    Username = IO.requestUsername(scanner);
                     try {
                         server = new Server(port);
-                        System.out.println("Твой IP: " + myAddress);
-                        System.out.println("Сервер создан на порту: " + port);
+                        System.out.println("Сервер создан");
+                        System.out.println("Твой Айпи: " + myAddress);
+                        System.out.println("Твой Порт: " + port);
+                        System.out.println("Твой Ник: " + Username);
                         break;
                     } catch (IOException e) {
                         System.err.println("Ошибка. Порт занят, попробуйте другой.");
                     }
                 }
 
-                server.start();
+                server.start(Username);
                 while (!Server.chatOpened) {
                     IO.printServerMenu();
                     choice = scanner.nextLine();
@@ -51,7 +57,7 @@ public class Main {
                     else if (choice.equals("1")) {
                         String ip = IO.requestIP(scanner);
                         int port = IO.requestPort(scanner);
-                        server.connect(ip, port);
+                        server.connect(ip, port, Username);
                     }
                     
                     else if (choice.equals("2")) {
@@ -66,16 +72,15 @@ public class Main {
                             while (true) {
                                 String input = scanner.nextLine();
                                 try {   
-
                                     int number = Integer.parseInt(input);
 
                                     Server.chatOpened = true;
-                                    Server.peersList.get(number - 1).runWriter();
+                                    Server.peersList.get(number - 1).runWriter(Username);
                                     break;
                                 } catch (NumberFormatException e) {
                                     System.err.println("Введите номер чата.");
                                 } catch (IndexOutOfBoundsException e) {
-                                    System.out.println("Такого списка несуществует.");
+                                    System.out.println("Такого номера несуществует.");
                                 }
                             }
                         }
@@ -96,6 +101,5 @@ public class Main {
             };for (String log : cerver) {System.out.println(log);
                 Thread.sleep(500);}
         }
-        
     }
 }
