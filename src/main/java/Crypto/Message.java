@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Message {
-    String string;
+    String messageText;
     byte[] paddedBytes;
 
     public Message(String string) {
-        this.string = string;
+        this.messageText = string;
         byte[] unpaddedBytes = string.getBytes(StandardCharsets.UTF_8);
 
         int paddingSize = 16 - unpaddedBytes.length % 16;
