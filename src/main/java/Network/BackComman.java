@@ -1,6 +1,6 @@
 package Network;
 
-public class BackCommand implements Command {
+public class BackComman implements Command {
 
     @Override
     public void execute() {

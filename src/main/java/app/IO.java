@@ -1,3 +1,5 @@
+package app;
+
 import java.util.Scanner;
 
 /**
@@ -6,21 +8,32 @@ import java.util.Scanner;
 public class IO {
     private static final int DEFAULT_PORT = 5000;
     private static final String DEFAULT_IP = "127.0.0.1";
+    private static final String DEFAULT_USER_NAME = "User";
 
     // INPUT
     public static String requestUsername(Scanner scanner) {
-        System.out.println("Твоё имя?");
-        return scanner.nextLine();
+        System.out.println("Введи Имя пользователя, для идентификации в сети.");
+        String input = scanner.nextLine();
+        while (true) {
+            try {
+                if (input.isEmpty()) {
+                    return DEFAULT_USER_NAME;
+                }
+                return input;
+            } catch (Exception e) {
+                System.err.println("Ошибка. Неверный формат Имени.");
+            }
+        }
     }
 
     public static String requestIP(Scanner scanner) {
-        System.out.println("Введи ip пользователя.\n(" + DEFAULT_IP + " по умолчанию, нажми Enter)");
+        System.out.println("Введи Айпи пользователя.\n(" + DEFAULT_IP + " по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
             try {
                 return getIp(input);
             } catch (NumberFormatException e) {
-                System.err.println("Ошибка. Порт должен состоять только из цыфр");
+                System.err.println("Ошибка. Айпи должен состоять только из цыфр");
             }
         }
     }
