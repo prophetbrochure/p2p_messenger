@@ -1,4 +1,4 @@
-package Crypto.Testing;
+package Testing;
 
 import Crypto.AES128_CTR_MAC;
 import Crypto.EncryptedMessage;
