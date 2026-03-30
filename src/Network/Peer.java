@@ -9,6 +9,7 @@ public class Peer {
     private final InetAddress ip;
     private final int port;
     private List<String> history = new ArrayList<>();
+    private String Username;
     private boolean isActive;
 
     public Peer(InetAddress ip, int port) {
@@ -29,8 +30,16 @@ public class Peer {
         return history;
     }
 
+    public String getUsername() {
+        return Username;
+    }
+
     public boolean isActive() {
         return isActive;
+    }
+
+    public void setUsername(String Username) {
+        this.Username = Username;
     }
 
     // TODO в новой реализации, где пир либо актив либо нет, название connected
