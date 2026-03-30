@@ -1,24 +1,15 @@
-
-FROM eclipse-temurin:21-jdk-alpine AS build
+# Этап 1: Сборка через Maven
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
-
-# Копируем исходники
+COPY pom.xml .
 COPY src ./src
+# Собираем проект (пропускаем тесты для скорости)
+RUN mvn clean package -DskipTests
 
-# Находим все java файлы
-
-RUN mkdir bin && \
-    find src -name "*.java" > sources.txt && \
-    javac -encoding UTF-8 -d bin @sources.txt
-
-
+# Этап 2: Запуск
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+# Копируем только готовый JAR-файл
+COPY --from=build /app/target/p2p-messenger-1.0-SNAPSHOT.jar app.jar
 
-
-COPY --from=build /app/bin ./bin
-
-# Указываем точку входа по умолчанию (Main)
-# Если нужно запустить конкретный тест, определяем при запуске
-ENTRYPOINT ["java", "-cp", "bin"]
-CMD ["Main"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
