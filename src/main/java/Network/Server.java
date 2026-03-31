@@ -42,6 +42,7 @@ public class Server {
                         peerHandler.handShake(Username);
     
                         boolean isUserInPeersList = false;
+                        // TODO Функционал Сохранения чата если 1 вышел.
                         // for (int i = 0; i < peersList.size(); i++) {
                         //     PeerHandler tempPeerHandler = peersList.get(i);
                         //     Peer tempPeer = tempPeerHandler.getPeer();
@@ -50,7 +51,7 @@ public class Server {
                         //         isUserInPeersList = true;
                         //         // System.out.println("ВХОДЯЩЕЕ: Такой пользователь уже был подключен. Подключаем снова");
                         //         tempPeerHandler.getSocket().close(); // ? надо ? закрывать
-                        //         peerHandler.getPeer().setHistory(tempPeerHandler.getPeer().getHistory()); // TODO поправить эту огромную строку тут, и в функции ниже
+                        //         peerHandler.getPeer().setHistory(tempPeerHandler.getPeer().getHistory());
                         //         peersList.set(i, peerHandler);
                         //         peerHandler.run();
                         //         break;

@@ -12,7 +12,7 @@ public class HistoryCommand implements Command {
         int i = 1;
         System.out.println("\n--------------- History ---------------");
         for (Message line : peer.getHistory()) {
-            System.out.println(i++ + ") " + line.printMessage());
+            System.out.println(i++ + ") " + line.messageToString());
         }
     }
 }

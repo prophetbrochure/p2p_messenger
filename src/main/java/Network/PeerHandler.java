@@ -30,9 +30,7 @@ public class PeerHandler {
     PeerHandler(Socket socket, Peer peer) throws IOException {
         this.socket = socket;
         this.peer = peer;
-        // this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         this.writer = new DataOutputStream(socket.getOutputStream());
-        // this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.reader = new DataInputStream(socket.getInputStream());
         commands.put("/history", new HistoryCommand(peer));
         commands.put("/exit", new ExitCommand(socket, writer));
@@ -124,17 +122,12 @@ public class PeerHandler {
             e.printStackTrace();
         }
         String input;
-        // try {
         input = read();
         if (input.contains("|UsErNaMe|")) {
             input = input.replace("|UsErNaMe|", "");
             peer.setUsername(input);
             System.out.println("Username собеседника: " + peer.getUsername());
         }
-        // } catch (IOException e) {
-        //     System.out.println("Ошибка при чтении Username");
-        //     e.printStackTrace();
-        // }
     }
 
     public void run() {
@@ -142,7 +135,6 @@ public class PeerHandler {
             public void run() {
 
                 String text = "";
-                // while (true) { // Непомню зачем он тут
                 try {
                     while (true) {
                         text = read();
@@ -158,15 +150,13 @@ public class PeerHandler {
                         }
                         Message message = new Message(peer.getUsername(), text);
                         if (Server.chatOpened) {
-                            message.printMessage();
+                            System.out.println(message.messageToString());
                         }
                         peer.getHistory().add(message);
                     }
                 } catch (IOException e1) {
                     System.out.println("Собеседник отключился. с ошибкой");
-                    // break;
                 }
-                // }
             }
         }).start();
     }

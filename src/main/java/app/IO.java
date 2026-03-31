@@ -73,14 +73,7 @@ public class IO {
     // OUTPUT
     public static void printHelloMessage() {
         System.out.println("Добро пожаловать в P2P messenger");
-        // System.out.println("Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь");
-    }
-
-    public static void printMenu() {
-        System.out.println("\t\tМеню:");
-        // System.out.println("1. Изменить свой Username");
-        System.out.println("1. Начать чат");
-        System.out.println("0. Закрыть программу");
+        System.out.println("Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь");
     }
 
     public static void printServerMenu() {

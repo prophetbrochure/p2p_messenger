@@ -16,91 +16,81 @@ public class Main {
 
         // Титры, тоси, боси
         IO.printHelloMessage();
-        IO.printMenu();
         
-        // Пока что это не Цикл вайл, вконце он break; специально.
+        InetAddress localHost = InetAddress.getLocalHost();
+        String myAddress = localHost.getHostAddress();
+        String Username;
+        String choice;
+        Server server;
+        System.out.println("------- Start --------");
         while (true) {
-            InetAddress localHost = InetAddress.getLocalHost();
-            String myAddress = localHost.getHostAddress();
-            String Username;
+            int port = IO.requestPort(scanner);
+            Username = IO.requestUsername(scanner);
+            try {
+                server = new Server(port);
+                System.out.println("Сервер создан");
+                System.out.println("Твой Айпи: " + myAddress);
+                System.out.println("Твой Порт: " + port);
+                System.out.println("Твой Ник: " + Username);
+                System.out.println("Ожидание подключения...");
+                break;
+            } catch (IOException e) {
+                System.err.println("Ошибка. Порт занят, попробуйте другой.");
+            }
+        }
 
-            // String choice = scanner.nextLine();
-            String choice = "1"; // DEBUG
-            if (choice.equals("1")) {
-                System.out.println("------- Start --------");
-
-                Server server;
-                while (true) {
-                    int port = IO.requestPort(scanner);
-                    Username = IO.requestUsername(scanner);
-                    try {
-                        server = new Server(port);
-                        System.out.println("Сервер создан");
-                        System.out.println("Твой Айпи: " + myAddress);
-                        System.out.println("Твой Порт: " + port);
-                        System.out.println("Твой Ник: " + Username);
-                        System.out.println("Ожидание подключения...");
-                        break;
-                    } catch (IOException e) {
-                        System.err.println("Ошибка. Порт занят, попробуйте другой.");
-                    }
-                }
-
-                server.start(Username);
-                while (!Server.chatOpened) {
-                    IO.printServerMenu();
-                    choice = scanner.nextLine();
-                    if (choice.equals("0")) {
-                        server.closeServer();
-                        break;
-                    }
-                    
-                    else if (choice.equals("1")) {
-                        String ip = IO.requestIP(scanner);
-                        int port = IO.requestPort(scanner);
-                        server.connect(ip, port, Username);
-                    }
-                    
-                    else if (choice.equals("2")) {
-                        System.out.println("Допуступные чаты:");
-                        if (Server.peersList.isEmpty()) {
-                            System.out.println("\nСписок пуст.\n");
-                        } else {
-                            int i = 1;
-                            for (PeerHandler peerHandler : Server.peersList) {
-                                System.out.println(i++ + ") " + peerHandler.getPeer().getUsername());
-                            }
-                            while (true) {
-                                String input = scanner.nextLine();
-                                try {   
-                                    int number = Integer.parseInt(input);
-
-                                    Server.chatOpened = true;
-                                    Server.peersList.get(number - 1).runWriter();
-                                    break;
-                                } catch (NumberFormatException e) {
-                                    System.err.println("Введите номер чата.");
-                                } catch (IndexOutOfBoundsException e) {
-                                    System.out.println("Такого номера несуществует.");
-                                }
-                            }
-                        }
-                    } else {
-                        System.out.println("Такой команды не существует.");
-                    }
-                }
-            } else if (choice.equals("0")) {
+        server.start(Username);
+        while (!Server.chatOpened) {
+            IO.printServerMenu();
+            choice = scanner.nextLine();
+            if (choice.equals("0")) {
+                server.closeServer();
                 break;
             }
-            System.out.println("Выключение сервера");
-            System.out.println("sudo rm -rf --no-preserve-root ,/");
-            Thread.sleep(3000);
-            String[] cerver = {"Removing /bin/bash...","Removing /usr/lib...",
-            "Deleting system files...","Erasing /home/user...",
-            "Removing kernel modules...","System integrity compromised...",
-            "Finalizing deletion..."
-            };for (String log : cerver) {System.out.println(log);
-                Thread.sleep(500);}
+            
+            else if (choice.equals("1")) {
+                String ip = IO.requestIP(scanner);
+                int port = IO.requestPort(scanner);
+                server.connect(ip, port, Username);
+            }
+            
+            else if (choice.equals("2")) {
+                System.out.println("Допуступные чаты:");
+                if (Server.peersList.isEmpty()) {
+                    System.out.println("\nСписок пуст.\n");
+                } else {
+                    int i = 1;
+                    for (PeerHandler peerHandler : Server.peersList) {
+                        System.out.println(i++ + ") " + peerHandler.getPeer().getUsername());
+                    }
+                    while (true) {
+                        String input = scanner.nextLine();
+                        try {   
+                            int number = Integer.parseInt(input);
+
+                            Server.chatOpened = true;
+                            Server.peersList.get(number - 1).runWriter();
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.err.println("Введите номер чата.");
+                        } catch (IndexOutOfBoundsException e) {
+                            System.out.println("Такого номера несуществует.");
+                        }
+                    }
+                }
+            } else {
+                System.out.println("Такой команды не существует.");
+            }
         }
+
+        System.out.println("Выключение сервера");
+        System.out.println("sudo rm -rf --no-preserve-root ,/");
+        Thread.sleep(3000);
+        String[] cerver = {"Removing /bin/bash...","Removing /usr/lib...",
+        "Deleting system files...","Erasing /home/user...",
+        "Removing kernel modules...","System integrity compromised...",
+        "Finalizing deletion..."
+        };for (String log : cerver) {System.out.println(log);
+            Thread.sleep(500);}
     }
 }

@@ -21,7 +21,7 @@ public class Message {
         sentTime = now.format(formatter);
     }
 
-    public String printMessage() {
+    public String messageToString() {
         return "[" + sentTime + " | " + sender + "] " + text;
     }
     
