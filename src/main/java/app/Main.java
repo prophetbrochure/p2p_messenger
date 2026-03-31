@@ -24,8 +24,8 @@ public class Main {
             String myAddress = localHost.getHostAddress();
             String Username;
 
-            String choice = scanner.nextLine();
-            // String choice = "1"; // DEBUG
+            // String choice = scanner.nextLine();
+            String choice = "1"; // DEBUG
             if (choice.equals("1")) {
                 System.out.println("------- Start --------");
 

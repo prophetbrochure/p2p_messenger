@@ -11,8 +11,8 @@ public class HistoryCommand implements Command {
     public void execute() {
         int i = 1;
         System.out.println("\n--------------- History ---------------");
-        for (String line : peer.getHistory()) {
-            System.out.println(i++ + ") " + line);
+        for (Message line : peer.getHistory()) {
+            System.out.println(i++ + ") " + line.printMessage());
         }
     }
 }

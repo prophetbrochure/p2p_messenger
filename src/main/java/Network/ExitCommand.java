@@ -1,17 +1,15 @@
 package Network;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.io.BufferedWriter;
 
 public class ExitCommand implements Command {
     private final Socket socket;
-    private final Peer peer;
-    private BufferedWriter writer;
+    private DataOutputStream writer;
 
-    public ExitCommand(Peer peer, Socket socket, BufferedWriter writer) {
+    public ExitCommand(Socket socket, DataOutputStream writer) {
         this.socket = socket;
-        this.peer = peer;
         this.writer = writer;
     }
 
@@ -19,7 +17,6 @@ public class ExitCommand implements Command {
     public void execute() {
         System.out.println("Отключение собеседника.");
         Server.chatOpened = false;
-        peer.setActive(false);
         try {
             writer.close();
             socket.close();

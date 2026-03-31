@@ -8,14 +8,12 @@ import java.util.List;
 public class Peer {
     private final InetAddress ip;
     private final int port;
-    private List<String> history = new ArrayList<>();
+    private List<Message> history = new ArrayList<Message>();
     private String Username;
-    private boolean isActive;
 
     public Peer(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.isActive = true;
     }
 
     public InetAddress getIp() {
@@ -26,7 +24,7 @@ public class Peer {
         return port;
     }
 
-    List<String> getHistory() {
+    List<Message> getHistory() {
         return history;
     }
 
@@ -34,21 +32,11 @@ public class Peer {
         return Username;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
     public void setUsername(String Username) {
         this.Username = Username;
     }
 
-    public void setHistory(List<String> history) {
+    public void setHistory(List<Message> history) {
         this.history = history;
-    }
-
-    // TODO в новой реализации, где пир либо актив либо нет, название connected
-    // не корректно новерное
-    public void setActive(boolean connected) {
-        isActive = connected;
     }
 }
