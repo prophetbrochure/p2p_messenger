@@ -24,8 +24,8 @@ public class Main {
             String myAddress = localHost.getHostAddress();
             String Username;
 
-            // String choice = scanner.nextLine();
-            String choice = "1"; // DEBUG
+            String choice = scanner.nextLine();
+            // String choice = "1"; // DEBUG
             if (choice.equals("1")) {
                 System.out.println("------- Start --------");
 
@@ -39,6 +39,7 @@ public class Main {
                         System.out.println("Твой Айпи: " + myAddress);
                         System.out.println("Твой Порт: " + port);
                         System.out.println("Твой Ник: " + Username);
+                        System.out.println("Ожидание подключения...");
                         break;
                     } catch (IOException e) {
                         System.err.println("Ошибка. Порт занят, попробуйте другой.");
@@ -67,7 +68,7 @@ public class Main {
                         } else {
                             int i = 1;
                             for (PeerHandler peerHandler : Server.peersList) {
-                                System.out.println(i++ + ") " + peerHandler.getPeer().getIp());
+                                System.out.println(i++ + ") " + peerHandler.getPeer().getUsername());
                             }
                             while (true) {
                                 String input = scanner.nextLine();
@@ -75,7 +76,7 @@ public class Main {
                                     int number = Integer.parseInt(input);
 
                                     Server.chatOpened = true;
-                                    Server.peersList.get(number - 1).runWriter(Username);
+                                    Server.peersList.get(number - 1).runWriter();
                                     break;
                                 } catch (NumberFormatException e) {
                                     System.err.println("Введите номер чата.");
@@ -92,7 +93,7 @@ public class Main {
                 break;
             }
             System.out.println("Выключение сервера");
-            System.out.println("sudo rm -rf --no-preserve-root ​/");
+            System.out.println("sudo rm -rf --no-preserve-root ,/");
             Thread.sleep(3000);
             String[] cerver = {"Removing /bin/bash...","Removing /usr/lib...",
             "Deleting system files...","Erasing /home/user...",

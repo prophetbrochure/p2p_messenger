@@ -42,6 +42,10 @@ public class Peer {
         this.Username = Username;
     }
 
+    public void setHistory(List<String> history) {
+        this.history = history;
+    }
+
     // TODO в новой реализации, где пир либо актив либо нет, название connected
     // не корректно новерное
     public void setActive(boolean connected) {
