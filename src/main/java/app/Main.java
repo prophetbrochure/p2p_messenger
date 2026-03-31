@@ -1,4 +1,4 @@
-package app;
+ /*package app;
 
 import java.util.Scanner;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import Network.PeerHandler;
 import Network.Server;
 /**
  * <p>Основная точка входа в программу. (А чё, кому-то непонятно???)</p>
- */
+
 public class Main {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
@@ -103,3 +103,174 @@ public class Main {
         }
     }
 }
+*/
+ package app;
+
+ import javafx.application.Application;
+ import javafx.geometry.Insets;
+ import javafx.geometry.Pos;
+ import javafx.scene.Scene;
+ import javafx.scene.control.*;
+ import javafx.scene.image.Image;
+ import javafx.scene.image.ImageView;
+ import javafx.scene.layout.*;
+ import javafx.scene.text.Text;
+ import javafx.stage.Stage;
+ import java.io.InputStream;
+ //import server;
+
+ public class Main extends Application {
+
+     // --- 1. Поля класса для доступа из разных методов ---
+     private ImageView wifiIcon;
+     private Image noWifi;
+     private Image wifi;
+     //private server;
+     
+     // Стили кнопок и элементов
+     private final String activeStyle = "-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;";
+     private final String inactiveStyle = "-fx-background-color: white; -fx-text-fill: #5f6368; -fx-border-color: #dadce0; -fx-padding: 10 20;";
+     private final String btnEnabledStyle = "-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;";
+     private final String btnDisabledStyle = "-fx-background-color: #cbd5e0; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: default;";
+     private final String fieldStyle = "-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 15px; -fx-padding: 0 15 0 15;";
+
+     @Override
+     public void start(Stage primaryStage) {
+         primaryStage.setTitle("P2P Messenger");
+
+         // --- 2. Загрузка ресурсов ---
+         try {
+             InputStream mainIcon = getClass().getResourceAsStream("/icon.png");
+             if (mainIcon != null) primaryStage.getIcons().add(new Image(mainIcon));
+
+             InputStream isNo = getClass().getResourceAsStream("/icon-no-wifi.png");
+             InputStream isYes = getClass().getResourceAsStream("/icon-wifi.png");
+             if (isNo != null) noWifi = new Image(isNo);
+             if (isYes != null) wifi = new Image(isYes);
+         } catch (Exception e) {
+             System.out.println("Ошибка загрузки изображений: " + e.getMessage());
+         }
+
+         // --- 3. Создание узлов интерфейса (UI Nodes) ---
+
+         // Переключатель режима
+         Button btn_Wait = new Button("Wait for Connection");
+         Button btn_Con = new Button("Connect to User");
+
+         // Карточка
+         VBox card = new VBox(15);
+         card.setPadding(new Insets(30));
+         card.setMaxWidth(380);
+         card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 8);");
+
+         // Заголовок
+         wifiIcon = new ImageView();
+         wifiIcon.setFitWidth(24);
+         wifiIcon.setPreserveRatio(true);
+         if (noWifi != null) wifiIcon.setImage(noWifi);
+
+         Text title = new Text("Wait for Connection");
+         title.setStyle("-fx-font-size: 20px; -fx-font-family: 'Segoe UI', sans-serif; -fx-fill: #2d3748;");
+
+         HBox headerLine = new HBox(10, wifiIcon, title);
+         headerLine.setAlignment(Pos.CENTER_LEFT);
+
+         Text description = new Text("Start listening for incoming connections on a specific port");
+         description.setStyle("-fx-fill: #718096; -fx-font-size: 13px;");
+         description.setWrappingWidth(300);
+
+         // Поля ввода
+         Label nameLabel = new Label("Your Nickname");
+         nameLabel.setStyle("-fx-text-fill: #4a5568; -fx-font-weight: bold;");
+         TextField nameField = new TextField();
+         nameField.setPromptText("Enter your nickname");
+         nameField.setPrefHeight(45);
+         nameField.setStyle(fieldStyle);
+
+         Label portLabel = new Label("Your Port");
+         portLabel.setStyle("-fx-text-fill: #4a5568; -fx-font-weight: bold;");
+         TextField portField = new TextField("5000");
+         portField.setPrefHeight(45);
+         portField.setStyle(fieldStyle);
+
+         VBox inputFieldsContainer = new VBox(10, portLabel, portField);
+
+         Button actionBtn = new Button("Start Waiting");
+         actionBtn.setMaxWidth(Double.MAX_VALUE);
+         actionBtn.setPrefHeight(48);
+
+         // --- 4. Функциональная логика ---
+
+         // Проверка заполнения полей
+         Runnable updateUIState = () -> {
+             boolean isPortFilled = !portField.getText().trim().isEmpty();
+             boolean isNameFilled = !nameField.getText().trim().isEmpty();
+             boolean isConnectMode = inputFieldsContainer.getChildren().contains(nameField);
+
+             boolean canActivate = isConnectMode ? (isPortFilled && isNameFilled) : isPortFilled;
+
+             actionBtn.setStyle(canActivate ? btnEnabledStyle : btnDisabledStyle);
+             actionBtn.setDisable(!canActivate);
+         };
+
+         // Слушатели ввода
+         portField.textProperty().addListener((obs, old, val) -> updateUIState.run());
+         nameField.textProperty().addListener((obs, old, val) -> updateUIState.run());
+
+         // Действие: Режим Ожидания
+         btn_Wait.setOnAction(e -> {
+             btn_Wait.setStyle(activeStyle + "-fx-background-radius: 10 0 0 10; -fx-border-radius: 10 0 0 10;");
+             btn_Con.setStyle(inactiveStyle + "-fx-background-radius: 0 10 10 0; -fx-border-radius: 0 10 10 0; -fx-border-width: 1 1 1 0;");
+
+             if (noWifi != null) wifiIcon.setImage(noWifi);
+             title.setText("Wait for Connection");
+             description.setText("Start listening for incoming connections on a specific port");
+             portLabel.setText("Your Port");
+             actionBtn.setText("Start Waiting");
+
+             inputFieldsContainer.getChildren().setAll(portLabel, portField);
+             updateUIState.run();
+         });
+
+         // Действие: Режим Подключения
+         btn_Con.setOnAction(e -> {
+             btn_Con.setStyle(activeStyle + "-fx-background-radius: 0 10 10 0; -fx-border-radius: 0 10 10 0;");
+             btn_Wait.setStyle(inactiveStyle + "-fx-background-radius: 10 0 0 10; -fx-border-radius: 10 0 0 10; -fx-border-width: 1 1 1 0;");
+
+             if (wifi != null) wifiIcon.setImage(wifi);
+             title.setText("Connect to User");
+             description.setText("Create a connection to another user's port");
+             portLabel.setText("Target Port");
+             actionBtn.setText("Create Connection");
+
+             inputFieldsContainer.getChildren().setAll(nameLabel, nameField, portLabel, portField);
+             updateUIState.run();
+         });
+
+         // --- 5. Компоновка (Layout Assembly) ---
+
+         HBox toggleGroup = new HBox(0, btn_Wait, btn_Con);
+         toggleGroup.setAlignment(Pos.CENTER);
+
+         // Начальное состояние кнопок переключателя
+         btn_Wait.setStyle(activeStyle + "-fx-background-radius: 10 0 0 10; -fx-border-radius: 10 0 0 10;");
+         btn_Con.setStyle(inactiveStyle + "-fx-background-radius: 0 10 10 0; -fx-border-radius: 0 10 10 0; -fx-border-width: 1 1 1 0;");
+
+         card.getChildren().addAll(headerLine, description, inputFieldsContainer, actionBtn);
+
+         VBox mainLayout = new VBox(30, toggleGroup, card);
+         mainLayout.setAlignment(Pos.CENTER);
+         mainLayout.setStyle("-fx-background-color: #f8f9fa;"); // Светло-серый фон окна
+
+         // Устанавливаем начальное состояние кнопки
+         updateUIState.run();
+
+         Scene scene = new Scene(new StackPane(mainLayout), 600, 550);
+         primaryStage.setScene(scene);
+         primaryStage.show();
+     }
+
+     public static void main(String[] args) {
+         launch(args);
+     }
+ }
