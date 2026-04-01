@@ -1,24 +1,29 @@
 package Network;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ExitCommand implements Command {
     private final Socket socket;
-    private DataOutputStream writer;
+    private Peer peer;
 
-    public ExitCommand(Socket socket, DataOutputStream writer) {
+    public ExitCommand(Socket socket, Peer peer) {
         this.socket = socket;
-        this.writer = writer;
+        this.peer = peer;
     }
 
     @Override
     public void execute() {
-        System.out.println("Отключение собеседника.");
         Server.chatOpened = false;
+
+        for (int i = 0; i < Server.peersList.size(); i++) {
+            if (Server.peersList.get(i).getPeer() == peer) {
+                Server.peersList.remove(i);
+                break;
+            }
+        }
+
         try {
-            writer.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

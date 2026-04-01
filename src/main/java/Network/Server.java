@@ -3,6 +3,7 @@ package Network;
 import java.io.IOException;
 
 import java.net.Socket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 
 import java.util.List;
@@ -35,30 +36,25 @@ public class Server {
                 while (true) {
                     try {
                         Socket socket = serverSocket.accept();
-                        System.out.println("Входящее подключение: " + socket.getInetAddress());
 
                         Peer peer = new Peer(socket.getInetAddress(), socket.getPort());
                         PeerHandler peerHandler = new PeerHandler(socket, peer);
                         peerHandler.handShake(Username);
-    
+
                         boolean isUserInPeersList = false;
-                        // TODO Функционал Сохранения чата если 1 вышел.
-                        // for (int i = 0; i < peersList.size(); i++) {
-                        //     PeerHandler tempPeerHandler = peersList.get(i);
-                        //     Peer tempPeer = tempPeerHandler.getPeer();
-    
-                        //     if (tempPeer.getIp().equals(socket.getInetAddress()) && tempPeer.getUsername().equals(peerHandler.getPeer().getUsername())) {
-                        //         isUserInPeersList = true;
-                        //         // System.out.println("ВХОДЯЩЕЕ: Такой пользователь уже был подключен. Подключаем снова");
-                        //         tempPeerHandler.getSocket().close(); // ? надо ? закрывать
-                        //         peerHandler.getPeer().setHistory(tempPeerHandler.getPeer().getHistory());
-                        //         peersList.set(i, peerHandler);
-                        //         peerHandler.run();
-                        //         break;
-                        //     }
-                        // }
+                        for (int i = 0; i < peersList.size(); i++) {
+                            PeerHandler tempPeerHandler = peersList.get(i);
+                            Peer tempPeer = tempPeerHandler.getPeer();
+
+                            if (tempPeer.getIp().equals(socket.getInetAddress())
+                                    && tempPeer.getUsername().equals(peerHandler.getPeer().getUsername())) {
+                                isUserInPeersList = true;
+                                break;
+                            }
+                        }
                         if (!isUserInPeersList) {
-                            // System.out.println("ВХОДЯЩЕЕ: Новый пользователь. Подключаем");
+                            System.out.println("Входящее подключение: " + socket.getInetAddress());
+                            System.out.println("Username: " + peer.getUsername());
                             peersList.add(peerHandler);
                             peerHandler.run();
                         }
@@ -78,23 +74,20 @@ public class Server {
             peerHandler.handShake(Username);
 
             boolean isUserInPeersList = false;
-            // for (int i = 0; i < peersList.size(); i++) {
-            //     PeerHandler tempPeerHandler = peersList.get(i);
-            //     Peer tempPeer = tempPeerHandler.getPeer();
-            //     InetAddress inetIp = InetAddress.getByName(ip);
-                
-            //     if (tempPeer.getIp().equals(inetIp) && tempPeer.getUsername().equals(peerHandler.getPeer().getUsername())) {
-            //         // System.out.println("ОТПРАВКА: Такой пользователь уже был подключен. Подключаем снова ");
-            //         isUserInPeersList = true;
-            //         tempPeerHandler.getSocket().close(); // ? надо ? закрывать
-            //         peerHandler.getPeer().setHistory(tempPeerHandler.getPeer().getHistory());
-            //         peersList.set(i, peerHandler);
-            //         peerHandler.run();
-            //         peerHandler.runWriter();
-            //     }
-            // }
+            for (int i = 0; i < peersList.size(); i++) {
+                PeerHandler tempPeerHandler = peersList.get(i);
+                Peer tempPeer = tempPeerHandler.getPeer();
+                InetAddress inetIp = InetAddress.getByName(ip);
+                tempPeerHandler.getSocket().getPort();
+
+                if (tempPeer.getIp().equals(inetIp)
+                        && tempPeer.getUsername().equals(peerHandler.getPeer().getUsername())) {
+                    System.out.println("Такой пользователь уже подключен.");
+                    isUserInPeersList = true;
+                    break;
+                }
+            }
             if (!isUserInPeersList) {
-                // System.out.println("ОТПРАВКА: Новый пользователь. Подключаем");
                 peersList.add(peerHandler);
                 peerHandler.run();
                 peerHandler.runWriter();

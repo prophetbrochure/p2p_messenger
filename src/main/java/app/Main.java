@@ -7,6 +7,7 @@ import java.net.InetAddress;
 
 import Network.PeerHandler;
 import Network.Server;
+
 /**
  * <p>Основная точка входа в программу. (А чё, кому-то непонятно???)</p>
  */
@@ -16,7 +17,7 @@ public class Main {
 
         // Титры, тоси, боси
         IO.printHelloMessage();
-        
+
         InetAddress localHost = InetAddress.getLocalHost();
         String myAddress = localHost.getHostAddress();
         String Username;
@@ -47,13 +48,13 @@ public class Main {
                 server.closeServer();
                 break;
             }
-            
+
             else if (choice.equals("1")) {
                 String ip = IO.requestIP(scanner);
                 int port = IO.requestPort(scanner);
                 server.connect(ip, port, Username);
             }
-            
+
             else if (choice.equals("2")) {
                 System.out.println("Допуступные чаты:");
                 if (Server.peersList.isEmpty()) {
@@ -65,7 +66,7 @@ public class Main {
                     }
                     while (true) {
                         String input = scanner.nextLine();
-                        try {   
+                        try {
                             int number = Integer.parseInt(input);
 
                             Server.chatOpened = true;
