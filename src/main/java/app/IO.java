@@ -1,6 +1,10 @@
 package app;
 
+import java.io.IOException;
 import java.util.Scanner;
+
+import Network.PeerHandler;
+import Network.Server;
 
 /**
  * Класс для работы с вводом/выводом.
@@ -9,6 +13,41 @@ public class IO {
     private static final int DEFAULT_PORT = 5000;
     private static final String DEFAULT_IP = "127.0.0.1";
     private static final String DEFAULT_USER_NAME = "User";
+
+    public static Server createServer(Scanner scanner) {
+        Server server;
+        int port = IO.requestPort(scanner);
+        while (true) {
+            try {
+                server = new Server(port);
+                break;
+            } catch (IOException e) {
+                System.err.println("Ошибка. Порт занят, попробуйте другой.");
+            }
+        }
+        return server;
+    }
+
+    public static void runPeerList(Scanner scanner) {
+        int i = 1;
+        for (PeerHandler peerHandler : Server.peersList) {
+            System.out.println(i++ + ") " + peerHandler.getPeer().getUsername());
+        }
+        while (true) {
+            String input = scanner.nextLine();
+            try {
+                int number = Integer.parseInt(input);
+                
+                Server.chatOpened = true;
+                Server.peersList.get(number - 1).runWriter();
+                break;
+            } catch (NumberFormatException e) {
+                System.err.println("Введите номер чата.");
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Такого номера несуществует.");
+            }
+        }
+    }
 
     // INPUT
     public static String requestUsername(Scanner scanner) {
@@ -27,7 +66,7 @@ public class IO {
     }
 
     public static String requestIP(Scanner scanner) {
-        System.out.println("Введи Айпи пользователя.\n(" + DEFAULT_IP + " по умолчанию, нажми Enter)");
+        System.out.println("Введи Айпи.\n(" + DEFAULT_IP + " по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
             try {
@@ -47,7 +86,7 @@ public class IO {
     }
 
     public static int requestPort(Scanner scanner) {
-        System.out.println("Введите порт пользователя.\n(" + DEFAULT_PORT + " по умолчанию, нажми Enter)");
+        System.out.println("Введите порт.\n(" + DEFAULT_PORT + " по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
             try {
@@ -80,6 +119,18 @@ public class IO {
         System.out.println("\n------------- Сервер Меню -------------");
         System.out.println("1. Подключиться к пользователю");
         System.out.println("2. Список подключений (Пиров)");
+        System.out.println("3. Просканировать сеть с указанным портом");
         System.out.println("0. Выйти");
+    }
+    public static void printServerInfo(String myAddress, int port, String Username) {
+        if (port != 0) {
+            System.out.println("Сервер создан");
+            System.out.println("Твой Айпи: " + myAddress);
+            System.out.println("Твой Порт: " + port);
+            System.out.println("Твой Ник: " + Username);
+            System.out.println("Ожидание подключения...");
+        } else {
+            System.out.println("Сервер не запущен");
+        }
     }
 }

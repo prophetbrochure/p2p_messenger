@@ -64,8 +64,8 @@ public class Server {
         }).start();
     }
 
-    public void connect(String ip, int port, String Username) {
-        System.out.println("Попытка подключиться к: " + ip);
+    public void connect(String ip, int port, String Username, boolean printResponse) {
+        if (printResponse) {System.out.println("Попытка подключиться к: " + ip);}
         try {
 
             Socket socket = new Socket(ip, port);
@@ -82,29 +82,32 @@ public class Server {
 
                 if (tempPeer.getIp().equals(inetIp)
                         && tempPeer.getUsername().equals(peerHandler.getPeer().getUsername())) {
-                    System.out.println("Такой пользователь уже подключен.");
+                    if (printResponse) {System.out.println("Такой пользователь уже подключен.");}
                     isUserInPeersList = true;
                     break;
                 }
             }
             if (!isUserInPeersList) {
+                System.out.println("Успешно соединено: " + ip);
                 peersList.add(peerHandler);
                 peerHandler.run();
-                peerHandler.runWriter();
+                // peerHandler.runWriter(); --------------------
             }
         } catch (IOException e) {
-            // Попытка переподключения
-            try {
-                if (reConnectionAttempts-- > 0) {
-                    System.out.println("Не удалось.\n");
-                    Thread.sleep(3000);
-                    connect(ip, port, Username);
-                } else {
-                    System.out.println("Введён неверный Адрес, или пользователь не в сети.");
-                    reConnectionAttempts = 3;
+            if (printResponse) {
+                // Попытка переподключения
+                try {
+                    if (reConnectionAttempts-- > 0) {
+                        System.out.println("Не удалось.\n");
+                        Thread.sleep(3000);
+                        connect(ip, port, Username, true);
+                    } else {
+                        System.out.println("Введён неверный Адрес, или пользователь не в сети.");
+                        reConnectionAttempts = 3;
+                    }
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
             }
         }
     }
