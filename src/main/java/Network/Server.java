@@ -65,7 +65,9 @@ public class Server {
     }
 
     public void connect(String ip, int port, String Username, boolean printResponse) {
-        if (printResponse) {System.out.println("Попытка подключиться к: " + ip);}
+        if (printResponse) {
+            System.out.println("Попытка подключиться к: " + ip);
+        }
         try {
 
             Socket socket = new Socket(ip, port);
@@ -82,7 +84,9 @@ public class Server {
 
                 if (tempPeer.getIp().equals(inetIp)
                         && tempPeer.getUsername().equals(peerHandler.getPeer().getUsername())) {
-                    if (printResponse) {System.out.println("Такой пользователь уже подключен.");}
+                    if (printResponse) {
+                        System.out.println("Такой пользователь уже подключен.");
+                    }
                     isUserInPeersList = true;
                     break;
                 }

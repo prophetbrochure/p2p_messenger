@@ -14,9 +14,8 @@ public class IO {
     private static final String DEFAULT_IP = "127.0.0.1";
     private static final String DEFAULT_USER_NAME = "User";
 
-    public static Server createServer(Scanner scanner) {
+    public static Server createServer(Scanner scanner, int port) {
         Server server;
-        int port = IO.requestPort(scanner);
         while (true) {
             try {
                 server = new Server(port);
@@ -37,7 +36,7 @@ public class IO {
             String input = scanner.nextLine();
             try {
                 int number = Integer.parseInt(input);
-                
+
                 Server.chatOpened = true;
                 Server.peersList.get(number - 1).runWriter();
                 break;
@@ -112,7 +111,8 @@ public class IO {
     // OUTPUT
     public static void printHelloMessage() {
         System.out.println("Добро пожаловать в P2P messenger");
-        System.out.println("Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь");
+        System.out.println(
+                "Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь");
     }
 
     public static void printServerMenu() {
@@ -122,9 +122,10 @@ public class IO {
         System.out.println("3. Просканировать сеть с указанным портом");
         System.out.println("0. Выйти");
     }
+
     public static void printServerInfo(String myAddress, int port, String Username) {
-        if (port != 0) {
-            System.out.println("Сервер создан");
+        if (!Username.equals(null)) {
+            System.out.println("\nСервер создан");
             System.out.println("Твой Айпи: " + myAddress);
             System.out.println("Твой Порт: " + port);
             System.out.println("Твой Ник: " + Username);

@@ -13,27 +13,29 @@ import java.nio.charset.StandardCharsets;
 import Network.Server;
 
 /**
- * <p>Основная точка входа в программу. (А чё, кому-то непонятно???)</p>
+ * <p>
+ * Основная точка входа в программу. (А чё, кому-то непонятно???)
+ * </p>
  */
 public class Main {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
-        
+
         IO.printHelloMessage();
-        
+
         String myAddress = getLocalIP();
-        System.out.println("myAddress" + myAddress);
         String Username = null;
         String choice;
         int port = 0;
 
         System.out.println("------- Start --------");
 
-        Server server = IO.createServer(scanner);
+        port = IO.requestPort(scanner);
+        Server server = IO.createServer(scanner, port);
 
         Username = IO.requestUsername(scanner);
         IO.printServerInfo(myAddress, port, Username);
-        
+
         server.start(Username);
         while (!Server.chatOpened) {
             IO.printServerMenu();
@@ -51,7 +53,7 @@ public class Main {
                 port = IO.requestPort(scanner);
                 server.connect(ip, port, Username, true);
             }
-            
+
             // Вывести доступные контакты
             else if (choice.equals("2")) {
                 System.out.println("Допуступные чаты:");
@@ -60,8 +62,8 @@ public class Main {
                 } else {
                     IO.runPeerList(scanner);
                 }
-            } 
-            
+            }
+
             // Подключиться ко всем собеседникам с указанным портом
             else if (choice.equals("3")) {
                 System.out.println("Попытка подключиться ко всем в сети c указанным портом.\n");
@@ -75,7 +77,7 @@ public class Main {
                     final int index = i;
                     new Thread(() -> {
                         String tempIpAddress = base + index;
-                        if (tempIpAddress == (myAddress)) {
+                        if (tempIpAddress.equals(myAddress)) {
                             tempIpAddress = base + index + 1;
                         }
                         server.connect(tempIpAddress, commonPort, tempUsername, false);
@@ -85,7 +87,7 @@ public class Main {
                 System.out.println("Такой команды не существует.");
             }
         }
-        
+
         System.out.println("Выключение сервера");
         System.out.println("sudo rm -rf --no-preserve-root ,/");
         Thread.sleep(3000);String[] cerver = {"Removing /bin/bash...",
@@ -96,14 +98,14 @@ public class Main {
     }
 
     public static String getLocalIP() throws SocketException {
-    
+
         Enumeration<NetworkInterface> interfacesList = NetworkInterface.getNetworkInterfaces();
         while (interfacesList.hasMoreElements()) {
             NetworkInterface networkInterface = interfacesList.nextElement();
             if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) {
                 continue;
             }
-        
+
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress addr = addresses.nextElement();
