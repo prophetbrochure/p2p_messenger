@@ -92,10 +92,11 @@ public class Server {
                 }
             }
             if (!isUserInPeersList) {
-                System.out.println("Успешно соединено: " + ip);
+                if (printResponse) {
+                    System.out.println("Успешно соединено: " + ip);
+                }
                 peersList.add(peerHandler);
                 peerHandler.run();
-                // peerHandler.runWriter(); --------------------
             }
         } catch (IOException e) {
             if (printResponse) {

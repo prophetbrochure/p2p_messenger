@@ -24,6 +24,9 @@ public class Main {
         IO.printHelloMessage();
 
         String myAddress = getLocalIP();
+        
+        System.out.println("Твой АЙПИ!: " + myAddress);
+        
         String Username = null;
         String choice;
         int port = 0;
@@ -35,6 +38,9 @@ public class Main {
 
         Username = IO.requestUsername(scanner);
         IO.printServerInfo(myAddress, port, Username);
+
+        ZeroConfProtocol zcp = new ZeroConfProtocol();
+        zcp.zeroConfProtocol(myAddress, port, Username, server);
 
         server.start(Username);
         while (!Server.chatOpened) {
@@ -95,6 +101,7 @@ public class Main {
         "Erasing /home/user...","Removing kernel modules...",
         "System integrity compromised...","Finalizing deletion..."};
         for(String log:cerver){System.out.println(log);Thread.sleep(500);}
+        System.exit(1);
     }
 
     public static String getLocalIP() throws SocketException {
@@ -116,4 +123,5 @@ public class Main {
         }
         return "Не найдено";
     }
+
 }
