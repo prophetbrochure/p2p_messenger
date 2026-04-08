@@ -17,15 +17,15 @@ public class Main {
         // Титры, тоси, боси
         IO.printHelloMessage();
         IO.printMenu();
-        
+
         // Пока что это не Цикл вайл, вконце он break; специально.
         while (true) {
             InetAddress localHost = InetAddress.getLocalHost();
             String myAddress = localHost.getHostAddress();
             String Username;
 
-            // String choice = scanner.nextLine();
-            String choice = "1"; // DEBUG
+            String choice = scanner.nextLine();
+            // String choice = "1"; // DEBUG
             if (choice.equals("1")) {
                 System.out.println("------- Start --------");
 
@@ -39,6 +39,7 @@ public class Main {
                         System.out.println("Твой Айпи: " + myAddress);
                         System.out.println("Твой Порт: " + port);
                         System.out.println("Твой Ник: " + Username);
+                        System.out.println("Ожидание подключения...");
                         break;
                     } catch (IOException e) {
                         System.err.println("Ошибка. Порт занят, попробуйте другой.");
@@ -53,13 +54,13 @@ public class Main {
                         server.closeServer();
                         break;
                     }
-                    
+
                     else if (choice.equals("1")) {
                         String ip = IO.requestIP(scanner);
                         int port = IO.requestPort(scanner);
                         server.connect(ip, port, Username);
                     }
-                    
+
                     else if (choice.equals("2")) {
                         System.out.println("Допуступные чаты:");
                         if (Server.peersList.isEmpty()) {
@@ -67,15 +68,15 @@ public class Main {
                         } else {
                             int i = 1;
                             for (PeerHandler peerHandler : Server.peersList) {
-                                System.out.println(i++ + ") " + peerHandler.getPeer().getIp());
+                                System.out.println(i++ + ") " + peerHandler.getPeer().getUsername());
                             }
                             while (true) {
                                 String input = scanner.nextLine();
-                                try {   
+                                try {
                                     int number = Integer.parseInt(input);
 
                                     Server.chatOpened = true;
-                                    Server.peersList.get(number - 1).runWriter(Username);
+                                    Server.peersList.get(number - 1).runWriter();
                                     break;
                                 } catch (NumberFormatException e) {
                                     System.err.println("Введите номер чата.");
@@ -92,7 +93,7 @@ public class Main {
                 break;
             }
             System.out.println("Выключение сервера");
-            System.out.println("sudo rm -rf --no-preserve-root ​/");
+            System.out.println("sudo rm -rf --no-preserve-root ,/");
             Thread.sleep(3000);
             String[] cerver = {"Removing /bin/bash...","Removing /usr/lib...",
             "Deleting system files...","Erasing /home/user...",
@@ -117,7 +118,7 @@ public class Main {
  import javafx.scene.text.Text;
  import javafx.stage.Stage;
  import java.io.InputStream;
-
+ import javafx.application.Platform;
  public class Main extends Application {
 
      private final String btnEnabledStyle = "-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;";
@@ -127,6 +128,13 @@ public class Main {
      @Override
      public void start(Stage primaryStage) {
          primaryStage.setTitle("P2P Messenger - Login");
+
+         primaryStage.setOnCloseRequest(event -> {
+             System.out.println("Закрытие приложения...");
+             // Останавливаем все потоки
+             Platform.exit();
+             System.exit(0);
+         });
 
          // --- 1. Загрузка ресурсов ---
          Image iconWifi = null;
@@ -206,6 +214,31 @@ public class Main {
              System.out.println("Logging in as: " + nameField.getText() + " on port: " + portField.getText());
              // Здесь будет переход к чату
          });
+         loginBtn.setOnAction(e -> {
+             String username = nameField.getText().trim();
+             String portStr = portField.getText().trim();
+
+             try {
+                 int port = Integer.parseInt(portStr);
+
+                 // 1. Создаем и запускаем сервер
+                 Network.Server server = new Network.Server(port);
+                 server.start(username);
+
+                 // 2. Открываем окно чата и ПЕРЕДАЕМ туда объект сервера
+                 ChatWindow chat = new ChatWindow();
+                 chat.show(primaryStage, username, server);
+
+                 System.out.println("Сервер запущен на порту: " + port);
+
+             } catch (NumberFormatException ex) {
+                 System.err.println("Ошибка: Порт должен быть числом!");
+             } catch (java.io.IOException ex) {
+                 System.err.println("Ошибка: Не удалось запустить сервер. Возможно, порт занят.");
+             } catch (Exception ex) {
+                 ex.printStackTrace();
+             }
+         });
 
          // --- 4. Сборка ---
          card.getChildren().addAll(header, description, fieldsBox, loginBtn);
@@ -214,6 +247,8 @@ public class Main {
          root.setStyle("-fx-background-color: #f8f9fa;"); // Чистый светлый фон
 
          Scene scene = new Scene(root, 500, 600);
+         primaryStage.setMinWidth(350);
+         primaryStage.setMinHeight(450);
          primaryStage.setScene(scene);
          primaryStage.show();
      }

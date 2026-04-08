@@ -18,11 +18,12 @@ public class ExitCommand implements Command {
     @Override
     public void execute() {
         System.out.println("Отключение собеседника.");
-        Server.chatOpened = false;
-        peer.setActive(false);
+
         try {
-            writer.close();
-            socket.close();
+            // Закрытие потока и сокета вызовет исключение в потоке чтения PeerHandler,
+            // что в свою очередь запустит цепочку closeConnection() и обновит UI.
+            if (writer != null) writer.close();
+            if (socket != null) socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

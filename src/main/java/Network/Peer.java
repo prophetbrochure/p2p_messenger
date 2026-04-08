@@ -15,31 +15,39 @@ public class Peer {
     public Peer(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.isActive = true;
+        this.isOnline = true;
+    }
+
+    public List<String> getHistory() {
+        return history;
     }
 
     public InetAddress getIp() {
         return ip;
     }
-
     public int getPort() {
         return port;
     }
-
-    List<String> getHistory() {
-        return history;
-    }
-
     public String getUsername() {
         return Username;
     }
-
     public boolean isActive() {
         return isActive;
     }
+    public void addMessageToHistory(String message) {
+        this.history.add(message);
+    }
+    private boolean isOnline = true;
+
+    public boolean isOnline() { return isOnline; }
+    public void setOnline(boolean online) { isOnline = online; }
 
     public void setUsername(String Username) {
         this.Username = Username;
+    }
+
+    public void setHistory(List<String> history) {
+        this.history = history;
     }
 
     // TODO в новой реализации, где пир либо актив либо нет, название connected

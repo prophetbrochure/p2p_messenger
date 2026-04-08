@@ -1,117 +1,136 @@
 package Network;
 
 import java.io.IOException;
-
 import java.net.Socket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-
 import java.util.List;
 import java.util.ArrayList;
 
 public class Server {
     private ServerSocket serverSocket;
     private int reConnectionAttempts = 3;
+
     public static List<PeerHandler> peersList = new ArrayList<>();
-    public static boolean chatOpened = false;
+    private static app.ChatWindow chatWindowInstance;
 
     public Server(int port) throws IOException {
-        this.serverSocket = new ServerSocket(port);
+        this.serverSocket = new ServerSocket();
+        this.serverSocket.setReuseAddress(true);
+        this.serverSocket.bind(new java.net.InetSocketAddress(port));
+    }
+
+    public void setChatWindow(app.ChatWindow window) {
+        chatWindowInstance = window;
+    }
+
+    public static app.ChatWindow getChatWindow() {
+        return chatWindowInstance;
     }
 
     public void closeServer() {
         try {
-            serverSocket.close();
+            if (serverSocket != null) serverSocket.close();
         } catch (IOException e) {
             System.out.println("Ошибка при закрытии Сервера");
-            e.printStackTrace();
         }
     }
 
-    public void start(String Username) {
-        // Создается отдельный поток,
-        // который ждёт и обрабатывает подключения
-        new Thread(new Runnable() {
-            public void run() {
-                System.out.println("Ожидание подключения...");
-                while (true) {
-                    try {
-                        Socket socket = serverSocket.accept();
-                        System.out.println("Входящее подключение: " + socket.getInetAddress());
-    
-                        boolean isUserInPeersList = false;
-                        for (int i = 0; i < peersList.size(); i++) {
-                            PeerHandler peerHandler = peersList.get(i);
-                            System.out.println("В ПОИСКАХ NULL" + peerHandler.getPeer().getPort());
-                            Peer peer = peerHandler.getPeer();
-    
-                            if (peer.getIp().equals(socket.getInetAddress()) & peer.getPort() == socket.getPort()) {
-                                isUserInPeersList = true;
-                                System.out.println("ВХОДЯЩЕЕ: Такой пользователь уже был подключен. Подключаем снова ");
-                                peerHandler.getSocket().close();
-                                peerHandler = new PeerHandler(socket, peer);
-                                peersList.set(i, peerHandler);
-                                peerHandler.run();
-                                break;
-                            }
-                        }
-                        if (!isUserInPeersList) {
-                            System.out.println("ВХОДЯЩЕЕ: Новый пользователь. Подключаем");
-                            Peer peer = new Peer(socket.getInetAddress(), socket.getPort());
-                            PeerHandler peerHandler = new PeerHandler(socket, peer);
-                            peerHandler.run();
-                            peersList.add(peerHandler);
-                        }
-                    } catch (IOException e) {} // Если при первом запуске, сразу выключить сервер
+    public void start(String myUsername) {
+        Thread serverThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Socket socket = serverSocket.accept();
+                    System.out.println("Входящее подключение: " + socket.getInetAddress());
+
+                    Peer newPeerData = new Peer(socket.getInetAddress(), socket.getPort());
+                    PeerHandler newHandler = new PeerHandler(socket, newPeerData);
+                    newHandler.handShake(myUsername);
+
+                    processConnection(newHandler);
+
+                } catch (IOException e) {
+                    break;
                 }
             }
-        }).start();
+        });
+        serverThread.setDaemon(true);
+        serverThread.start();
     }
 
-    public void connect(String ip, int port, String Username) {
+    public int getPort() {
+        return serverSocket.getLocalPort();
+    }
+
+    public void connect(String ip, int port, String myUsername) {
         System.out.println("Попытка подключиться к: " + ip);
         try {
+            Socket socket = new Socket(ip, port);
+            Peer newPeerData = new Peer(socket.getInetAddress(), socket.getPort());
+            PeerHandler newHandler = new PeerHandler(socket, newPeerData);
+            newHandler.handShake(myUsername);
 
-            boolean isUserInPeersList = false;
-            for (int i = 0; i < peersList.size(); i++) {
-                PeerHandler peerHandler = peersList.get(i);
-                Peer peer = peerHandler.getPeer();
-                InetAddress inetIp = InetAddress.getByName(ip);
-                
-                if (peer.getIp().equals(inetIp) && peer.getPort() == port) {
-                    System.out.println("ОТПРАВКА: Такой пользователь уже был подключен. Подключаем снова ");
-                    isUserInPeersList = true;
-                    Socket socket = new Socket(ip, port, inetIp, peerHandler.getSocket().getLocalPort());
-                    peerHandler.getSocket().close();
-                    peerHandler = new PeerHandler(socket, peer);
-                    peersList.set(i, peerHandler);
-                    peerHandler.run();
-                    peerHandler.runWriter(Username); // username по приколу написал
-                }
-            }
-            if (!isUserInPeersList) {
-                System.out.println("ОТПРАВКА: Новый пользователь. Подключаем");
-                Socket socket = new Socket(ip, port);
-                Peer peer = new Peer(socket.getInetAddress(), socket.getPort());
-                PeerHandler peerHandler = new PeerHandler(socket, peer);
-                peerHandler.run();
-                peersList.add(peerHandler);
-                peerHandler.runWriter(Username);
-            }
+            processConnection(newHandler);
+
         } catch (IOException e) {
-            // Попытка переподключения
-            try {
-                if (reConnectionAttempts-- > 0) {
-                    System.out.println("Не удалось.\n");
-                    Thread.sleep(3000);
-                    connect(ip, port, Username);
-                } else {
-                    System.out.println("Введён неверный Адрес, или пользователь не в сети.");
-                    reConnectionAttempts = 3;
-                }
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+            handleReconnection(ip, port, myUsername);
+        }
+    }
+
+    /**
+     * Общая логика для входящих и исходящих соединений.
+     * Проверяет, есть ли пользователь в списке, обновляет его или добавляет новый.
+     */
+    private void processConnection(PeerHandler newHandler) {
+        boolean isAlreadyInList = false;
+        InetAddress remoteIp = newHandler.getPeer().getIp();
+        String remoteName = newHandler.getPeer().getUsername();
+
+        for (int i = 0; i < peersList.size(); i++) {
+            PeerHandler existingHandler = peersList.get(i);
+            Peer existingPeer = existingHandler.getPeer();
+
+            // Проверяем по IP и имени
+            if (existingPeer.getIp().equals(remoteIp) && existingPeer.getUsername().equals(remoteName)) {
+                isAlreadyInList = true;
+
+                // Закрываем старый сокет, если он вдруг еще открыт
+                try { existingHandler.getSocket().close(); } catch (Exception e) {}
+
+                // Переносим старую историю в новый объект
+                newHandler.getPeer().setHistory(existingPeer.getHistory());
+                newHandler.getPeer().setOnline(true); // Ставим статус Online
+
+                // Заменяем старый хендлер новым (с активным сокетом)
+                peersList.set(i, newHandler);
+                newHandler.run();
+                break;
             }
+        }
+
+        if (!isAlreadyInList) {
+            peersList.add(newHandler);
+            newHandler.run();
+        }
+
+        if (chatWindowInstance != null) {
+            chatWindowInstance.updateUI();
+        }
+    }
+
+    private void handleReconnection(String ip, int port, String myUsername) {
+        try {
+            if (reConnectionAttempts-- > 0) {
+                System.out.println("Не удалось. Повтор через 3 сек...");
+                Thread.sleep(3000);
+                connect(ip, port, myUsername);
+            } else {
+                System.out.println("Не удалось подключиться. Пользователь оффлайн.");
+                reConnectionAttempts = 3;
+                if (chatWindowInstance != null) chatWindowInstance.updateUI();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }
