@@ -1,15 +1,7 @@
 package app;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-
-import java.util.Enumeration;
 import java.util.Scanner;
-
 import java.nio.charset.StandardCharsets;
-
 import Network.Server;
 
 /**
@@ -23,15 +15,13 @@ public class Main {
 
         IO.printHelloMessage();
 
-        String myAddress = getLocalIP();
-        
-        System.out.println("Твой АЙПИ!: " + myAddress);
+        System.out.println("------- Start --------");
+        String myAddress = IO.selectLocalNetwork(scanner);
         
         String Username = null;
         String choice;
         int port = 0;
 
-        System.out.println("------- Start --------");
 
         port = IO.requestPort(scanner);
         Server server = IO.createServer(scanner, port);
@@ -103,25 +93,4 @@ public class Main {
         for(String log:cerver){System.out.println(log);Thread.sleep(500);}
         System.exit(1);
     }
-
-    public static String getLocalIP() throws SocketException {
-
-        Enumeration<NetworkInterface> interfacesList = NetworkInterface.getNetworkInterfaces();
-        while (interfacesList.hasMoreElements()) {
-            NetworkInterface networkInterface = interfacesList.nextElement();
-            if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) {
-                continue;
-            }
-
-            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                if (addr instanceof Inet4Address && addr.isSiteLocalAddress()) {
-                    return addr.getHostAddress();
-                }
-            }
-        }
-        return "Не найдено";
-    }
-
 }

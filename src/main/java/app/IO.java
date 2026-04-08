@@ -1,6 +1,15 @@
 package app;
 
 import java.io.IOException;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Scanner;
 
 import Network.PeerHandler;
@@ -48,9 +57,60 @@ public class IO {
         }
     }
 
+    public static ArrayList<String> getLocalIP() throws SocketException {
+
+        Enumeration<NetworkInterface> interfacesList = NetworkInterface.getNetworkInterfaces();
+        ArrayList<String> addressesList = new ArrayList<>();
+        while (interfacesList.hasMoreElements()) {
+            NetworkInterface networkInterface = interfacesList.nextElement();
+            if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) {
+                continue;
+            }
+
+            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                InetAddress addr = addresses.nextElement();
+                if (addr instanceof Inet4Address) {
+                    addressesList.add(addr.getHostAddress());
+                }
+            }
+        }
+        return addressesList;
+    }
+
+    public static String selectLocalNetwork(Scanner scanner) throws Exception {
+        List<String> addressesList = getLocalIP();
+        if (addressesList.size() >= 2) {
+            System.out.println("Выбери локальную сеть.\n('" + addressesList.get(0) + "' по умолчанию, нажми Enter)");
+            for (int i = 0; i < addressesList.size(); i++) {
+                System.out.println(i + 1 + ") " + addressesList.get(i));
+            }
+            int number;
+            while (true) {
+                String input = scanner.nextLine();
+                if (input.equals("")) {
+                    input = "1";
+                }
+                try {
+                    number = Integer.parseInt(input);
+                    if (number > addressesList.size()) {
+                        System.err.println("Такого номера не существует");
+                        continue;
+                    }
+                    break;
+                } catch (NumberFormatException e) {
+                    System.err.println("Введите цыфру.");
+                }
+            }
+            return addressesList.get(number - 1);
+        } else {
+            return addressesList.get(0);
+        }
+    }
+
     // INPUT
     public static String requestUsername(Scanner scanner) {
-        System.out.println("Введи Имя пользователя, для идентификации в сети.");
+        System.out.println("Введи Имя пользователя.\n('" + DEFAULT_USER_NAME + "' по умолчанию, нажми Enter)");
         String input = scanner.nextLine();
         while (true) {
             try {
@@ -65,7 +125,7 @@ public class IO {
     }
 
     public static String requestIP(Scanner scanner) {
-        System.out.println("Введи Айпи.\n(" + DEFAULT_IP + " по умолчанию, нажми Enter)");
+        System.out.println("Введи Айпи.\n('" + DEFAULT_IP + "' по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
             try {
@@ -85,7 +145,7 @@ public class IO {
     }
 
     public static int requestPort(Scanner scanner) {
-        System.out.println("Введите порт.\n(" + DEFAULT_PORT + " по умолчанию, нажми Enter)");
+        System.out.println("Введите порт.\n('" + DEFAULT_PORT + "' по умолчанию, нажми Enter)");
         while (true) {
             String input = scanner.nextLine();
             try {
@@ -112,7 +172,7 @@ public class IO {
     public static void printHelloMessage() {
         System.out.println("Добро пожаловать в P2P messenger");
         System.out.println(
-                "Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь");
+                "Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь\n");
     }
 
     public static void printServerMenu() {
@@ -129,7 +189,6 @@ public class IO {
             System.out.println("Твой Айпи: " + myAddress);
             System.out.println("Твой Порт: " + port);
             System.out.println("Твой Ник: " + Username);
-            System.out.println("Ожидание подключения...");
         } else {
             System.out.println("Сервер не запущен");
         }
