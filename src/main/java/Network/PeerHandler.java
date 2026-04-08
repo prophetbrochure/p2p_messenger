@@ -56,10 +56,16 @@ public class PeerHandler {
         }
     }
 
-    public void send(String text) throws IOException {
+    /** Отправляет текст собеседнику. 
+     * @param text Текст для отправки
+     * @param isMessage true добавит сообщение в историю чата. false просто отправит сообщение пользователю
+     */
+    public void send(String text, boolean isMessage) throws IOException {
         Message message = new Message(peer.getUsername(), text);
 
-        peer.getHistory().add(message);
+        if (isMessage) {
+            peer.getHistory().add(message);
+        }
 
         String text_to_encrypt = new String(message.getText());
 
@@ -103,6 +109,9 @@ public class PeerHandler {
         return text;
     }
 
+    /**
+    * @param Username Наш Никнейм 
+    */
     public void handShake(String Username) {
 
         DH dh = new DH(Constants.generator, Constants.module);
@@ -122,7 +131,7 @@ public class PeerHandler {
         cipher_sex = new AES128_CTR_MAC(encKey, macKey);
 
         try {
-            send("|UsErNaMe|" + Username);
+            send("|UsErNaMe|" + Username, false);
         } catch (IOException e) {
             System.out.println("Ошибка при передачи Username который: " + Username);
         }
@@ -176,7 +185,7 @@ public class PeerHandler {
             if (command == null) {
                 Message message = null;
                 try {
-                    send(text);
+                    send(text, true);
                 } catch (IOException e) {
                     System.err.println("Ошибка при отправке сообщения. Сохранено в истории и ВЫХОД.");
                     peer.getHistory().add(message);
