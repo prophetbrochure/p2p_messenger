@@ -113,6 +113,7 @@ public class PeerHandler {
     * @param Username Наш Никнейм 
     */
     public void handShake(String Username) {
+        this.Username = Username;
 
         DH dh = new DH(Constants.generator, Constants.module);
         byte[] keyBytes = dh.getPublicKey().toByteArray();
