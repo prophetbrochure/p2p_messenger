@@ -21,6 +21,7 @@ import java.math.BigInteger;
 public class PeerHandler {
     private final Peer peer;
     private Socket socket;
+    private String Username; // Наш ник
     private DataOutputStream writer;
     private DataInputStream reader;
     private AES128_CTR_MAC cipher_sex;
@@ -32,6 +33,7 @@ public class PeerHandler {
         this.peer = peer;
         this.writer = new DataOutputStream(socket.getOutputStream());
         this.reader = new DataInputStream(socket.getInputStream());
+        commands.put("/vlad", new VladCommand(this));
         commands.put("/history", new HistoryCommand(peer));
         commands.put("/exit", new ExitCommand(socket, peer));
         commands.put("/back", new BackComman());
@@ -60,12 +62,10 @@ public class PeerHandler {
      * @param text Текст для отправки
      * @param isMessage true добавит сообщение в историю чата. false просто отправит сообщение пользователю
      */
-    public void send(String text, boolean isMessage) throws IOException {
-        Message message = new Message(peer.getUsername(), text);
+    public void send(String text) throws IOException {
+        Message message = new Message(Username, text);
 
-        if (isMessage) {
-            peer.getHistory().add(message);
-        }
+        peer.getHistory().add(message);
 
         String text_to_encrypt = new String(message.getText());
 
@@ -130,11 +130,11 @@ public class PeerHandler {
 
         cipher_sex = new AES128_CTR_MAC(encKey, macKey);
 
-        try {
-            send("|UsErNaMe|" + Username, false);
-        } catch (IOException e) {
-            System.out.println("Ошибка при передачи Username который: " + Username);
-        }
+        String text_to_encrypt = "|UsErNaMe|" + Username;
+        EncryptedMessage encryptedMessage = cipher_sex.encrypt(text_to_encrypt.getBytes());
+        byte[] bytesUsername = encryptedMessage.toBytes();
+        writeBytes(bytesUsername);
+        
         String input;
         input = read();
         if (input.contains("|UsErNaMe|")) {
@@ -151,12 +151,12 @@ public class PeerHandler {
                 while (true) {
                     text = read();
                     if (text == null) {
-                        System.out.println("Собеседник отключился.111");
+                        System.out.println("Собеседник отключился.");
                         commands.get("/exit").execute();
                         break;
                     }
                     if (text.equals("/exit")) {
-                        System.out.println("Собеседник отключился.222");
+                        System.out.println("Собеседник отключился.");
                         commands.get("/exit").execute();
                         break;
                     }
@@ -185,7 +185,7 @@ public class PeerHandler {
             if (command == null) {
                 Message message = null;
                 try {
-                    send(text, true);
+                    send(text);
                 } catch (IOException e) {
                     System.err.println("Ошибка при отправке сообщения. Сохранено в истории и ВЫХОД.");
                     peer.getHistory().add(message);

@@ -1,6 +1,7 @@
 package app;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -12,7 +13,8 @@ import Network.Server;
 public class ZeroConfProtocol {
     public void zeroConfProtocol(String localIP, int port, String Username, Server server) {
         try {
-            JmDNS jmdns = JmDNS.create(localIP);
+            InetAddress inetIP = InetAddress.getByName(localIP);
+            JmDNS jmdns = JmDNS.create(inetIP);
             ServiceInfo serviceInfo = ServiceInfo.create(
                 "_p2pchat._tcp.local.",
                 Username,
@@ -24,10 +26,13 @@ public class ZeroConfProtocol {
             
             jmdns.addServiceListener("_p2pchat._tcp.local.", new ServiceListener() {
                 @Override
-                public void serviceAdded(ServiceEvent event) {}
+                public void serviceAdded(ServiceEvent event) {
+                    jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+                }
         
                 @Override
-                public void serviceRemoved(ServiceEvent event) {}
+                public void serviceRemoved(ServiceEvent event) {
+                }
                 
                 @Override
                 public void serviceResolved(ServiceEvent event) {
