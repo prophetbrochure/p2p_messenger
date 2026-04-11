@@ -1,17 +1,17 @@
 package p2pmessenger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+import p2pmessenger.network.NetworkUtils;
 import p2pmessenger.network.Server;
 import p2pmessenger.network.ZeroConfProtocol;
 import p2pmessenger.util.IO;
-import p2pmessenger.network.NetworkUtils;
-
-import java.nio.charset.StandardCharsets;
+import p2pmessenger.util.ServerManager;
 
 /**
  * <p>
- * Основная точка входа в программу. (А чё, кому-то непонятно???)
+ * Основная точка входа в программу.
  * </p>
  */
 public class Main {
@@ -20,72 +20,22 @@ public class Main {
 
         IO.printHelloMessage();
 
-        System.out.println("------- Start --------");
         String myAddress = NetworkUtils.selectLocalNetwork(scanner);
         
-        String Username = null;
-        String choice;
-        int port = 0;
-
-        port = IO.requestPort(scanner);
+        // Создание сервера на порту
+        int port = IO.requestPort(scanner);
         Server server = NetworkUtils.createServer(scanner, port);
 
-        Username = IO.requestUsername(scanner);
-        IO.printServerInfo(myAddress, port, Username);
+        String username = IO.requestUsername(scanner);
+        IO.printServerInfo(myAddress, port, username);
 
+        // Авто подключение к пирам в локальной сети
         ZeroConfProtocol zcp = new ZeroConfProtocol();
-        zcp.zeroConfProtocol(myAddress, port, Username, server);
+        zcp.zeroConfProtocol(myAddress, port, username, server);
 
-        server.start(Username);
-        while (!server.getChatOpened()) {
-            IO.printServerMenu();
-            choice = scanner.nextLine();
-
-            // Выйти. Закрыть сервер
-            if (choice.equals("0")) {
-                server.closeServer();
-                break;
-            }
-
-            // Подключиться к комуто
-            else if (choice.equals("1")) {
-                String ip = IO.requestIP(scanner);
-                port = IO.requestPort(scanner);
-                server.connect(ip, port, Username, true);
-            }
-
-            // Вывести доступные контакты
-            else if (choice.equals("2")) {
-                System.out.println("Допуступные чаты:");
-                if (server.getPeersList().isEmpty()) {
-                    System.out.println("\nСписок пуст.\n");
-                } else {
-                    NetworkUtils.runPeerList(scanner, server);
-                }
-            }
-
-            // Подключиться ко всем собеседникам с указанным портом
-            else if (choice.equals("3")) {
-                System.out.println("Попытка подключиться ко всем в сети c указанным портом.\n");
-
-                // Первые 3 актета как у myAddress. Они не сканируются
-                String base = myAddress.substring(0, myAddress.lastIndexOf(".") + 1);
-
-                final String tempUsername = Username;
-                final int commonPort = IO.requestPort(scanner);
-                for (int i = 0; i <= 255; i++) {
-                    final int index = i;
-                    new Thread(() -> {
-                        String tempIpAddress = base + index;
-                        if (!tempIpAddress.equals(myAddress)) {
-                            server.connect(tempIpAddress, commonPort, tempUsername, false);
-                        }
-                    }).start();
-                }
-            } else {
-                System.out.println("Такой команды не существует.");
-            }
-        }
+        // Запуск сервера.
+        ServerManager serverManager = new ServerManager();
+        serverManager.run(server, myAddress, username, scanner);
 
         System.out.println("Выключение сервера");
         System.out.println("sudo rm -rf --no-preserve-root ,/");

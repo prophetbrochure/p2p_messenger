@@ -82,6 +82,7 @@ public class IO {
         System.out.println("Добро пожаловать в P2P messenger");
         System.out.println(
                 "Над проектом работали:\n\tДмитриев Андрей\n\tКорзухин Михаил\n\tСтройлов Виталий\n\tШилов Игорь\n");
+        System.out.println("------- Start --------");
     }
 
     public static void printServerMenu() {

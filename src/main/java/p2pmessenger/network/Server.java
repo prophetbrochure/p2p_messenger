@@ -34,7 +34,7 @@ public class Server {
         // Создается отдельный поток,
         // который ждёт и обрабатывает подключения
         new Thread(() -> {
-            
+
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();
