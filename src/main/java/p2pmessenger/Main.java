@@ -5,9 +5,9 @@ import java.util.Scanner;
 
 import p2pmessenger.network.NetworkUtils;
 import p2pmessenger.network.Server;
+import p2pmessenger.network.ServerManager;
 import p2pmessenger.network.ZeroConfProtocol;
 import p2pmessenger.util.IO;
-import p2pmessenger.util.ServerManager;
 
 /**
  * <p>
@@ -21,10 +21,10 @@ public class Main {
         IO.printHelloMessage();
 
         String myAddress = NetworkUtils.selectLocalNetwork(scanner);
-        
+
         // Создание сервера на порту
-        int port = IO.requestPort(scanner);
-        Server server = NetworkUtils.createServer(scanner, port);
+        Server server = NetworkUtils.createServer(scanner);
+        int port = server.getPort();
 
         String username = IO.requestUsername(scanner);
         IO.printServerInfo(myAddress, port, username);

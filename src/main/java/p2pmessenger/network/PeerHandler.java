@@ -118,8 +118,6 @@ public class PeerHandler {
             return;
         }
 
-        System.out.println("ПРОЧИТАЛИ КЛЮЧ ТОЛЬКО СЕЙЧАС");
-
         BigInteger readedBigInteger = new BigInteger(readed_message);
         dh.generateSharedSecret(readedBigInteger); // получаем ключ
 

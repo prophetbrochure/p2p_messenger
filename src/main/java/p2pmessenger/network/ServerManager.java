@@ -1,9 +1,8 @@
-package p2pmessenger.util;
+package p2pmessenger.network;
 
 import java.util.Scanner;
 
-import p2pmessenger.network.NetworkUtils;
-import p2pmessenger.network.Server;
+import p2pmessenger.util.IO;
 
 public class ServerManager {
     public void run(Server server, String myAddress, String username, Scanner scanner) {

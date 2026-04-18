@@ -16,10 +16,12 @@ public class Server {
     private final Scanner scanner;
     private boolean chatOpened = false;
     private int reConnectionAttempts = 3;
+    private int port;
 
     public Server(int port, Scanner scanner) throws IOException {
         this.serverSocket = new ServerSocket(port);
         this.scanner = scanner;
+        this.port = port;
     }
 
     public void closeServer() {
@@ -127,6 +129,10 @@ public class Server {
         return peersList;
     }
 
+    public int getPort() {
+        return port;
+    }
+
     public boolean getChatOpened() {
         return chatOpened;
     }
@@ -134,4 +140,5 @@ public class Server {
     public void setChatOpened(boolean chatOpened) {
         this.chatOpened = chatOpened;
     }
+
 }

@@ -10,11 +10,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
+import p2pmessenger.util.IO;
+
 public class NetworkUtils {
-    public static Server createServer(Scanner scanner, int port) {
+    public static Server createServer(Scanner scanner) {
         Server server;
         while (true) {
             try {
+                int port = IO.requestPort(scanner);
                 server = new Server(port, scanner);
                 break;
             } catch (IOException e) {
