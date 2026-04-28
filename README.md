@@ -18,7 +18,7 @@
 
 ## Требования:
 - Java21+
-- Maven
+- Maven 3
 
 
 ## Установка
@@ -26,18 +26,19 @@
 ```bash
   git clone https://github.com/prophetbrochure/p2p_messenger
 ```
-### Запуск через Javac:
-```bash
-  javac * или через Maven как-то там
-```
-```bash
-  javac p2pmessenger.Main
-```
 
 ### Запуск через Maven:
+```bash
+  mvn clean package
+```
+```bash
+  java -jar target/p2p_messenger-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
 
 ### Запуск через Docker:
-
+```bash
+  Чёт не придумали пока
+```
 
 
 ## Использование
@@ -72,7 +73,7 @@ src
 |   |       └── p2pmessenger
 |   |           ├── crypto         # Шифрование
 |   |           ├── Main.java      # Точка входа приложения
-|   |           ├── network        # Сетевой щит
+|   |           ├── network        # Сетевая часть приложения
 |   |           └── util           # Ввод/вывод и т. д.
 |   └── test                       # Тесты
 └── target                         # Исполняемые файлы
