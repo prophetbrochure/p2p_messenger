@@ -27,18 +27,21 @@
   git clone https://github.com/prophetbrochure/p2p_messenger
 ```
 
-### Запуск через Maven:
+### Сборка проекта
+#### Linux:
 ```bash
-  mvn clean package
+  ./mvnw clean package
 ```
+#### Windows:
 ```bash
-  java -jar target/p2p_messenger-1.0-SNAPSHOT-jar-with-dependencies.jar
+  mvnw.cmd clean package
 ```
 
-### Запуск через Docker:
+### Запуск
 ```bash
-  Чёт не придумали пока
+  java -jar target/p2p_messenger-1.0-jar-with-dependencies.jar
 ```
+
 
 
 ## Использование
